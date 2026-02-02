@@ -1,4 +1,4 @@
-import { Problem, DifficultyLevel } from '@/lib/types'
+import { Problem, DifficultyLevel } from '@/lib/api'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, Fire } from '@phosphor-icons/react'
@@ -7,7 +7,7 @@ import { useI18n } from '@/hooks/use-i18n'
 
 interface ProblemListProps {
   problems: Problem[]
-  solvedProblems: Set<string>
+  solvedProblems: Set<number>
   onSelectProblem: (problem: Problem) => void
 }
 

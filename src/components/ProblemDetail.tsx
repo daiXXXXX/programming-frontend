@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Problem, Submission } from '@/lib/types'
+import { Problem, Submission } from '@/lib/api'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -20,7 +20,7 @@ interface ProblemDetailProps {
   problem: Problem
   submissions: Submission[]
   onBack: () => void
-  onSubmit: (problemId: string, code: string) => Submission | undefined
+  onSubmit: (problemId: string, code: string) => Promise<Submission | undefined> | Submission | undefined
 }
 
 export function ProblemDetail({ problem, submissions, onBack, onSubmit }: ProblemDetailProps) {
@@ -29,9 +29,9 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [lastSubmission, setLastSubmission] = useState<Submission | null>(null)
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsSubmitting(true)
-    const result = onSubmit(problem.id, code)
+    const result = await onSubmit(String(problem.id), code)
     if (result) {
       setLastSubmission(result)
     }

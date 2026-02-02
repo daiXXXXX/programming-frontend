@@ -1,5 +1,4 @@
-import { ReactNode } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { ReactNode, useState, useEffect } from 'react'
 import { I18nContext } from '@/hooks/use-i18n'
 import { Language, getTranslation } from '@/lib/i18n'
 
@@ -8,12 +7,21 @@ interface I18nProviderProps {
 }
 
 export function I18nProvider({ children }: I18nProviderProps) {
-  const [language, setLanguage] = useKV<Language>('app-language', 'zh')
+  const [language, setLanguageState] = useState<Language>(() => {
+    // 从 localStorage 读取语言设置
+    const stored = localStorage.getItem('app-language')
+    return (stored as Language) || 'zh'
+  })
 
-  const t = getTranslation(language || 'zh')
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang)
+    localStorage.setItem('app-language', lang)
+  }
+
+  const t = getTranslation(language)
 
   return (
-    <I18nContext.Provider value={{ language: language || 'zh', setLanguage, t }}>
+    <I18nContext.Provider value={{ language, setLanguage, t }}>
       {children}
     </I18nContext.Provider>
   )
