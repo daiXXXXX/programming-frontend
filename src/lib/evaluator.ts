@@ -1,9 +1,10 @@
-import { TestCase, TestResult } from './types'
+import { TestCase, TestResult, SubmissionStatus } from './types'
 
 export function evaluateCode(code: string, testCases: TestCase[]): TestResult[] {
   const results: TestResult[] = []
 
   for (const testCase of testCases) {
+    const startTime = Date.now()
     try {
       const func = new Function('input', `
         ${code}
@@ -12,17 +13,25 @@ export function evaluateCode(code: string, testCases: TestCase[]): TestResult[] 
       
       const actualOutput = String(func(testCase.input)).trim()
       const expectedOutput = testCase.expectedOutput.trim()
+      const executionTime = Date.now() - startTime
       
       results.push({
         testCaseId: testCase.id,
         passed: actualOutput === expectedOutput,
-        actualOutput
+        input: testCase.input,
+        expectedOutput: testCase.expectedOutput,
+        actualOutput,
+        executionTime
       })
     } catch (error) {
+      const executionTime = Date.now() - startTime
       results.push({
         testCaseId: testCase.id,
         passed: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        input: testCase.input,
+        expectedOutput: testCase.expectedOutput,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        executionTime
       })
     }
   }
@@ -35,10 +44,10 @@ export function calculateScore(testResults: TestResult[]): number {
   return Math.round((passedCount / testResults.length) * 100)
 }
 
-export function getSubmissionStatus(testResults: TestResult[]): 'passed' | 'failed' | 'error' {
+export function getSubmissionStatus(testResults: TestResult[]): SubmissionStatus {
   const hasError = testResults.some(r => r.error)
-  if (hasError) return 'error'
+  if (hasError) return 'Runtime Error'
   
   const allPassed = testResults.every(r => r.passed)
-  return allPassed ? 'passed' : 'failed'
+  return allPassed ? 'Accepted' : 'Wrong Answer'
 }

@@ -1,4 +1,5 @@
-export type UserRole = 'instructor' | 'student'
+export type DifficultyLevel = 'Easy' | 'Medium' | 'Hard'
+export type SubmissionStatus = 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Time Limit Exceeded'
 
 export interface TestCase {
   id: string
@@ -7,35 +8,51 @@ export interface TestCase {
   description?: string
 }
 
-export interface Experiment {
+export interface Problem {
   id: string
   title: string
+  difficulty: DifficultyLevel
   description: string
-  requirements: string
+  inputFormat: string
+  outputFormat: string
+  constraints: string
+  examples: {
+    input: string
+    output: string
+    explanation?: string
+  }[]
   testCases: TestCase[]
-  deadline: string
+  tags: string[]
   createdAt: string
 }
 
 export interface TestResult {
   testCaseId: string
   passed: boolean
+  input: string
+  expectedOutput: string
   actualOutput?: string
   error?: string
+  executionTime?: number
 }
 
 export interface Submission {
   id: string
-  experimentId: string
+  problemId: string
   code: string
+  language: string
   submittedAt: string
   testResults: TestResult[]
   score: number
-  status: 'passed' | 'failed' | 'error'
+  status: SubmissionStatus
 }
 
-export interface UserContext {
-  role: UserRole
-  name: string
-  id: string
+export interface UserStats {
+  totalSolved: number
+  easySolved: number
+  mediumSolved: number
+  hardSolved: number
+  totalSubmissions: number
+  acceptedSubmissions: number
+  successRate: number
 }

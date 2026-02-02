@@ -1,79 +1,222 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Separator } from '@/components/ui/separator'
 import { 
-  Plus, 
-  UserCircle, 
-  ChartBar, 
-  Flask, 
   Code, 
-  ListBullets,
+  ChartBar, 
+  List,
   Play,
-  ChartLine
+  Trophy,
+  Fire
 } from '@phosphor-icons/react'
-import { Experiment, Submission, UserRole } from '@/lib/types'
-import { ExperimentCard } from '@/components/ExperimentCard'
-import { CreateExperimentDialog } from '@/components/CreateExperimentDialog'
-import { CodeEditor } from '@/components/CodeEditor'
-import { TestResultPanel } from '@/components/TestResultPanel'
-import { AnalyticsCharts } from '@/components/AnalyticsCharts'
-import { StudentProgressTable } from '@/components/StudentProgressTable'
-import { InstructorAnalytics } from '@/components/InstructorAnalytics'
+import { Problem, Submission, DifficultyLevel } from '@/lib/types'
+import { ProblemList } from '@/components/ProblemList'
+import { ProblemDetail } from '@/components/ProblemDetail'
+import { SubmissionHistory } from '@/components/SubmissionHistory'
+import { DashboardStats } from '@/components/DashboardStats'
 import { evaluateCode, calculateScore, getSubmissionStatus } from '@/lib/evaluator'
 import { toast } from 'sonner'
-import { format } from 'date-fns'
 import { motion } from 'framer-motion'
 
-function App() {
-  const [role, setRole] = useState<UserRole>('student')
-  const [experiments, setExperiments] = useKV<Experiment[]>('experiments', [])
-  const [submissions, setSubmissions] = useKV<Submission[]>('submissions', [])
-  const [createDialogOpen, setCreateDialogOpen] = useState(false)
-  const [selectedExperiment, setSelectedExperiment] = useState<Experiment | null>(null)
-  const [currentCode, setCurrentCode] = useState('')
-  const [activeTab, setActiveTab] = useState('dashboard')
-  const [viewingSubmission, setViewingSubmission] = useState<Submission | null>(null)
+const SAMPLE_PROBLEMS: Problem[] = [
+  {
+    id: '1',
+    title: 'Two Sum',
+    difficulty: 'Easy',
+    description: 'Given an array of integers and a target sum, return indices of the two numbers that add up to the target.',
+    inputFormat: 'First line: array of integers separated by spaces\nSecond line: target integer',
+    outputFormat: 'Two space-separated integers representing the indices (0-indexed)',
+    constraints: '• 2 ≤ array length ≤ 10⁴\n• -10⁹ ≤ array[i] ≤ 10⁹\n• Only one valid answer exists',
+    examples: [
+      {
+        input: '2 7 11 15\n9',
+        output: '0 1',
+        explanation: 'nums[0] + nums[1] = 2 + 7 = 9'
+      },
+      {
+        input: '3 2 4\n6',
+        output: '1 2',
+        explanation: 'nums[1] + nums[2] = 2 + 4 = 6'
+      }
+    ],
+    testCases: [
+      { id: 't1', input: '2 7 11 15\n9', expectedOutput: '0 1' },
+      { id: 't2', input: '3 2 4\n6', expectedOutput: '1 2' },
+      { id: 't3', input: '3 3\n6', expectedOutput: '0 1' }
+    ],
+    tags: ['Array', 'Hash Table'],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: '2',
+    title: 'Reverse String',
+    difficulty: 'Easy',
+    description: 'Write a function that reverses a string. The input string is given as an array of characters.',
+    inputFormat: 'A single line containing a string',
+    outputFormat: 'The reversed string',
+    constraints: '• 1 ≤ string length ≤ 10⁵\n• String consists of printable ASCII characters',
+    examples: [
+      {
+        input: 'hello',
+        output: 'olleh',
+        explanation: 'The string "hello" reversed is "olleh"'
+      },
+      {
+        input: 'world',
+        output: 'dlrow'
+      }
+    ],
+    testCases: [
+      { id: 't1', input: 'hello', expectedOutput: 'olleh' },
+      { id: 't2', input: 'world', expectedOutput: 'dlrow' },
+      { id: 't3', input: 'a', expectedOutput: 'a' }
+    ],
+    tags: ['String', 'Two Pointers'],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: '3',
+    title: 'Valid Palindrome',
+    difficulty: 'Easy',
+    description: 'Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.',
+    inputFormat: 'A single line containing a string',
+    outputFormat: 'true if palindrome, false otherwise',
+    constraints: '• 1 ≤ string length ≤ 2 × 10⁵\n• String consists of printable ASCII characters',
+    examples: [
+      {
+        input: 'A man, a plan, a canal: Panama',
+        output: 'true',
+        explanation: 'After removing non-alphanumeric and ignoring case: "amanaplanacanalpanama" is a palindrome'
+      },
+      {
+        input: 'race a car',
+        output: 'false'
+      }
+    ],
+    testCases: [
+      { id: 't1', input: 'A man, a plan, a canal: Panama', expectedOutput: 'true' },
+      { id: 't2', input: 'race a car', expectedOutput: 'false' },
+      { id: 't3', input: 'a', expectedOutput: 'true' }
+    ],
+    tags: ['String', 'Two Pointers'],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: '4',
+    title: 'Maximum Subarray',
+    difficulty: 'Medium',
+    description: 'Given an integer array, find the contiguous subarray with the largest sum and return its sum.',
+    inputFormat: 'Space-separated integers representing the array',
+    outputFormat: 'A single integer representing the maximum sum',
+    constraints: '• 1 ≤ array length ≤ 10⁵\n• -10⁴ ≤ array[i] ≤ 10⁴',
+    examples: [
+      {
+        input: '-2 1 -3 4 -1 2 1 -5 4',
+        output: '6',
+        explanation: 'The subarray [4,-1,2,1] has the largest sum = 6'
+      },
+      {
+        input: '1',
+        output: '1'
+      }
+    ],
+    testCases: [
+      { id: 't1', input: '-2 1 -3 4 -1 2 1 -5 4', expectedOutput: '6' },
+      { id: 't2', input: '1', expectedOutput: '1' },
+      { id: 't3', input: '5 4 -1 7 8', expectedOutput: '23' }
+    ],
+    tags: ['Array', 'Dynamic Programming'],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: '5',
+    title: 'Merge Sorted Arrays',
+    difficulty: 'Medium',
+    description: 'Given two sorted integer arrays, merge them into a single sorted array.',
+    inputFormat: 'First line: first sorted array (space-separated integers)\nSecond line: second sorted array (space-separated integers)',
+    outputFormat: 'Space-separated integers representing the merged sorted array',
+    constraints: '• 0 ≤ array length ≤ 1000\n• -10⁶ ≤ array[i] ≤ 10⁶',
+    examples: [
+      {
+        input: '1 3 5\n2 4 6',
+        output: '1 2 3 4 5 6'
+      },
+      {
+        input: '1\n2',
+        output: '1 2'
+      }
+    ],
+    testCases: [
+      { id: 't1', input: '1 3 5\n2 4 6', expectedOutput: '1 2 3 4 5 6' },
+      { id: 't2', input: '1\n2', expectedOutput: '1 2' },
+      { id: 't3', input: '1 2 3\n4 5 6', expectedOutput: '1 2 3 4 5 6' }
+    ],
+    tags: ['Array', 'Two Pointers'],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: '6',
+    title: 'Binary Search',
+    difficulty: 'Easy',
+    description: 'Given a sorted array and a target value, return the index if the target is found. If not, return -1.',
+    inputFormat: 'First line: sorted array (space-separated integers)\nSecond line: target integer',
+    outputFormat: 'Index of target (0-indexed) or -1 if not found',
+    constraints: '• 1 ≤ array length ≤ 10⁴\n• -10⁴ ≤ array[i], target ≤ 10⁴\n• All elements are unique',
+    examples: [
+      {
+        input: '1 2 3 4 5\n3',
+        output: '2'
+      },
+      {
+        input: '1 2 3 4 5\n6',
+        output: '-1'
+      }
+    ],
+    testCases: [
+      { id: 't1', input: '1 2 3 4 5\n3', expectedOutput: '2' },
+      { id: 't2', input: '1 2 3 4 5\n6', expectedOutput: '-1' },
+      { id: 't3', input: '1\n1', expectedOutput: '0' }
+    ],
+    tags: ['Array', 'Binary Search'],
+    createdAt: new Date().toISOString()
+  }
+]
 
-  const experimentsList = experiments || []
+function App() {
+  const [problems, setProblems] = useKV<Problem[]>('oj-problems', [])
+  const [submissions, setSubmissions] = useKV<Submission[]>('oj-submissions', [])
+  const [activeTab, setActiveTab] = useState('dashboard')
+  const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null)
+  const [filterDifficulty, setFilterDifficulty] = useState<DifficultyLevel | 'All'>('All')
+
+  useEffect(() => {
+    if (!problems || problems.length === 0) {
+      setProblems(SAMPLE_PROBLEMS)
+    }
+  }, [problems, setProblems])
+
+  const problemsList = problems || []
   const submissionsList = submissions || []
 
-  const handleCreateExperiment = (experimentData: Omit<Experiment, 'id' | 'createdAt'>) => {
-    const newExperiment: Experiment = {
-      ...experimentData,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString()
-    }
-    
-    setExperiments((current) => [...(current || []), newExperiment])
-    toast.success('Experiment created successfully!')
-  }
-
-  const handleDeleteExperiment = (id: string) => {
-    setExperiments((current) => (current || []).filter(e => e.id !== id))
-    setSubmissions((current) => (current || []).filter(s => s.experimentId !== id))
-    toast.success('Experiment deleted')
-  }
-
-  const handleSubmitCode = () => {
-    if (!selectedExperiment || !currentCode.trim()) {
+  const handleSubmitCode = (problemId: string, code: string) => {
+    const problem = problemsList.find(p => p.id === problemId)
+    if (!problem || !code.trim()) {
       toast.error('Please write some code before submitting')
       return
     }
 
-    const testResults = evaluateCode(currentCode, selectedExperiment.testCases)
+    const testResults = evaluateCode(code, problem.testCases)
     const score = calculateScore(testResults)
     const status = getSubmissionStatus(testResults)
 
     const newSubmission: Submission = {
       id: crypto.randomUUID(),
-      experimentId: selectedExperiment.id,
-      code: currentCode,
+      problemId,
+      code,
+      language: 'JavaScript',
       submittedAt: new Date().toISOString(),
       testResults,
       score,
@@ -81,69 +224,52 @@ function App() {
     }
 
     setSubmissions((current) => [...(current || []), newSubmission])
-    setViewingSubmission(newSubmission)
 
-    if (status === 'passed') {
-      toast.success(`All tests passed! Score: ${score}%`)
+    if (status === 'Accepted') {
+      toast.success(`✓ Accepted! All tests passed. Score: ${score}%`)
+    } else if (status === 'Runtime Error') {
+      toast.error(`✗ Runtime Error. Check your code for errors.`)
     } else {
-      toast.error(`Some tests failed. Score: ${score}%`)
+      toast.error(`✗ Wrong Answer. ${testResults.filter(r => r.passed).length}/${testResults.length} tests passed.`)
     }
+
+    return newSubmission
   }
 
-  const handleViewExperiment = (experiment: Experiment) => {
-    setSelectedExperiment(experiment)
-    setViewingSubmission(null)
-    setActiveTab('experiments')
-    
-    const lastSubmission = submissionsList
-      .filter(s => s.experimentId === experiment.id)
-      .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())[0]
-    
-    if (lastSubmission) {
-      setCurrentCode(lastSubmission.code)
-    } else {
-      setCurrentCode('')
-    }
+  const handleViewProblem = (problem: Problem) => {
+    setSelectedProblem(problem)
+    setActiveTab('problems')
   }
 
-  const experimentSubmissions = selectedExperiment
-    ? submissionsList.filter(s => s.experimentId === selectedExperiment.id)
-    : []
+  const filteredProblems = filterDifficulty === 'All' 
+    ? problemsList 
+    : problemsList.filter(p => p.difficulty === filterDifficulty)
 
-  const completedCount = experimentsList.filter(exp => {
-    const expSubmissions = submissionsList.filter(s => s.experimentId === exp.id)
-    return expSubmissions.some(s => s.status === 'passed')
-  }).length
-
-  const completionPercentage = experimentsList.length > 0 
-    ? Math.round((completedCount / experimentsList.length) * 100) 
-    : 0
+  const solvedProblems = new Set(
+    submissionsList
+      .filter(s => s.status === 'Accepted')
+      .map(s => s.problemId)
+  )
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card sticky top-0 z-50">
+      <header className="border-b border-border bg-card sticky top-0 z-50 backdrop-blur-sm bg-card/95">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Flask size={32} weight="duotone" className="text-primary" />
+              <Code size={32} weight="duotone" className="text-primary" />
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Programming Lab</h1>
-                <p className="text-sm text-muted-foreground">Experiment Teaching Platform</p>
+                <h1 className="text-2xl font-bold tracking-tight">OJ Platform</h1>
+                <p className="text-sm text-muted-foreground">Online Judge Practice System</p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <Button
-                variant={role === 'instructor' ? 'default' : 'outline'}
-                onClick={() => setRole(role === 'instructor' ? 'student' : 'instructor')}
-                className="gap-2"
-              >
-                <UserCircle size={20} />
-                {role === 'instructor' ? 'Instructor Mode' : 'Student Mode'}
-              </Button>
-              <Avatar>
-                <AvatarFallback>{role === 'instructor' ? 'IN' : 'ST'}</AvatarFallback>
-              </Avatar>
+              <div className="flex items-center gap-2 text-sm">
+                <Trophy size={20} className="text-accent" weight="fill" />
+                <span className="font-semibold">{solvedProblems.size}</span>
+                <span className="text-muted-foreground">Solved</span>
+              </div>
             </div>
           </div>
         </div>
@@ -151,21 +277,17 @@ function App() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-2xl grid-cols-4 mb-8">
+          <TabsList className="grid w-full max-w-xl grid-cols-3 mb-8">
             <TabsTrigger value="dashboard" className="gap-2">
               <ChartBar size={18} />
               Dashboard
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2">
-              <ChartLine size={18} />
-              Analytics
+            <TabsTrigger value="problems" className="gap-2">
+              <Code size={18} />
+              Problems
             </TabsTrigger>
-            <TabsTrigger value="experiments" className="gap-2">
-              <Flask size={18} />
-              Experiments
-            </TabsTrigger>
-            <TabsTrigger value="submissions" className="gap-2">
-              <ListBullets size={18} />
+            <TabsTrigger value="history" className="gap-2">
+              <List size={18} />
               History
             </TabsTrigger>
           </TabsList>
@@ -176,307 +298,58 @@ function App() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-6">Progress Overview</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  <Card className="p-4 bg-primary/5 border-primary/20">
-                    <div className="text-sm text-muted-foreground mb-1">Total Experiments</div>
-                    <div className="text-3xl font-bold text-primary">{experimentsList.length}</div>
-                  </Card>
-                  <Card className="p-4 bg-success/5 border-success/20">
-                    <div className="text-sm text-muted-foreground mb-1">Completed</div>
-                    <div className="text-3xl font-bold text-success">{completedCount}</div>
-                  </Card>
-                  <Card className="p-4 bg-accent/5 border-accent/20">
-                    <div className="text-sm text-muted-foreground mb-1">Success Rate</div>
-                    <div className="text-3xl font-bold text-accent">{completionPercentage}%</div>
-                  </Card>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Overall Completion</span>
-                    <span className="text-sm text-muted-foreground">{completedCount} / {experimentsList.length}</span>
-                  </div>
-                  <Progress value={completionPercentage} className="h-3" />
-                </div>
-              </Card>
+              <DashboardStats 
+                problems={problemsList}
+                submissions={submissionsList}
+                onViewProblem={handleViewProblem}
+              />
             </motion.div>
-
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Recent Experiments</h2>
-              {experimentsList.length === 0 ? (
-                <Card className="p-12 text-center">
-                  <Flask size={48} className="mx-auto text-muted-foreground mb-4" weight="duotone" />
-                  <h3 className="font-semibold mb-2">No experiments yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {role === 'instructor' 
-                      ? 'Create your first experiment to get started'
-                      : 'Check back later for new experiments'}
-                  </p>
-                  {role === 'instructor' && (
-                    <Button onClick={() => setCreateDialogOpen(true)}>
-                      <Plus size={18} className="mr-2" />
-                      Create Experiment
-                    </Button>
-                  )}
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {experimentsList.slice(-6).reverse().map(exp => (
-                    <ExperimentCard
-                      key={exp.id}
-                      experiment={exp}
-                      submissions={submissionsList.filter(s => s.experimentId === exp.id)}
-                      onView={() => handleViewExperiment(exp)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
           </TabsContent>
 
-          <TabsContent value="analytics" className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold">
-                    {role === 'instructor' ? 'Class Analytics' : 'Performance Analytics'}
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {role === 'instructor' 
-                      ? 'Monitor class progress and identify areas for improvement'
-                      : 'Track your progress and identify areas for improvement'
-                    }
-                  </p>
+          <TabsContent value="problems" className="space-y-6">
+            {!selectedProblem ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold">Problem Set</h2>
+                  <div className="flex gap-2">
+                    {(['All', 'Easy', 'Medium', 'Hard'] as const).map(level => (
+                      <Button
+                        key={level}
+                        variant={filterDifficulty === level ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setFilterDifficulty(level)}
+                      >
+                        {level}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-
-              {role === 'instructor' ? (
-                <InstructorAnalytics 
-                  experiments={experimentsList} 
-                  submissions={submissionsList}
+                <ProblemList
+                  problems={filteredProblems}
+                  solvedProblems={solvedProblems}
+                  onSelectProblem={setSelectedProblem}
                 />
-              ) : (
-                <>
-                  <AnalyticsCharts 
-                    experiments={experimentsList} 
-                    submissions={submissionsList} 
-                  />
-
-                  <div className="mt-8">
-                    <h3 className="text-xl font-semibold mb-4">Detailed Progress</h3>
-                    <StudentProgressTable
-                      experiments={experimentsList}
-                      submissions={submissionsList}
-                      onViewExperiment={handleViewExperiment}
-                    />
-                  </div>
-                </>
-              )}
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent value="experiments" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">
-                {selectedExperiment ? selectedExperiment.title : 'All Experiments'}
-              </h2>
-              {role === 'instructor' && !selectedExperiment && (
-                <Button onClick={() => setCreateDialogOpen(true)}>
-                  <Plus size={18} className="mr-2" />
-                  Create Experiment
-                </Button>
-              )}
-              {selectedExperiment && (
-                <Button variant="outline" onClick={() => setSelectedExperiment(null)}>
-                  Back to List
-                </Button>
-              )}
-            </div>
-
-            {!selectedExperiment ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {experimentsList.map(exp => (
-                  <ExperimentCard
-                    key={exp.id}
-                    experiment={exp}
-                    submissions={submissionsList.filter(s => s.experimentId === exp.id)}
-                    onView={() => handleViewExperiment(exp)}
-                    onEdit={role === 'instructor' ? () => {} : undefined}
-                    onDelete={role === 'instructor' ? () => handleDeleteExperiment(exp.id) : undefined}
-                  />
-                ))}
-              </div>
+              </>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-6">
-                  <Card className="p-6">
-                    <h3 className="font-semibold text-lg mb-4">Experiment Details</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="text-sm font-medium text-muted-foreground mb-1">Description</div>
-                        <p className="text-sm">{selectedExperiment.description}</p>
-                      </div>
-                      {selectedExperiment.requirements && (
-                        <div>
-                          <div className="text-sm font-medium text-muted-foreground mb-1">Requirements</div>
-                          <p className="text-sm whitespace-pre-wrap">{selectedExperiment.requirements}</p>
-                        </div>
-                      )}
-                      <Separator />
-                      <div>
-                        <div className="text-sm font-medium text-muted-foreground mb-1">Deadline</div>
-                        <p className="text-sm">{format(new Date(selectedExperiment.deadline), 'PPP p')}</p>
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-muted-foreground mb-1">Test Cases</div>
-                        <p className="text-sm">{selectedExperiment.testCases.length} test cases configured</p>
-                      </div>
-                    </div>
-                  </Card>
-
-                  <Card className="p-6">
-                    <h3 className="font-semibold text-lg mb-4">Submission History</h3>
-                    {experimentSubmissions.length === 0 ? (
-                      <p className="text-sm text-muted-foreground text-center py-4">No submissions yet</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {experimentSubmissions
-                          .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
-                          .slice(0, 5)
-                          .map(sub => (
-                            <Card 
-                              key={sub.id} 
-                              className="p-3 cursor-pointer hover:bg-accent/5"
-                              onClick={() => {
-                                setViewingSubmission(sub)
-                                setCurrentCode(sub.code)
-                              }}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="text-sm">
-                                  {format(new Date(sub.submittedAt), 'MMM d, HH:mm')}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Badge 
-                                    variant={sub.status === 'passed' ? 'default' : 'secondary'}
-                                    className={sub.status === 'passed' ? 'bg-success text-success-foreground' : 'bg-destructive text-destructive-foreground'}
-                                  >
-                                    {sub.score}%
-                                  </Badge>
-                                </div>
-                              </div>
-                            </Card>
-                          ))}
-                      </div>
-                    )}
-                  </Card>
-                </div>
-
-                <div className="space-y-6">
-                  <CodeEditor
-                    value={currentCode}
-                    onChange={setCurrentCode}
-                    disabled={role === 'instructor'}
-                  />
-                  
-                  {role === 'student' && (
-                    <Button 
-                      onClick={handleSubmitCode} 
-                      className="w-full gap-2"
-                      size="lg"
-                    >
-                      <Play size={20} weight="fill" />
-                      Submit & Evaluate
-                    </Button>
-                  )}
-
-                  {viewingSubmission && (
-                    <TestResultPanel
-                      testResults={viewingSubmission.testResults}
-                      testCases={selectedExperiment.testCases}
-                    />
-                  )}
-                </div>
-              </div>
+              <ProblemDetail
+                problem={selectedProblem}
+                submissions={submissionsList.filter(s => s.problemId === selectedProblem.id)}
+                onBack={() => setSelectedProblem(null)}
+                onSubmit={handleSubmitCode}
+              />
             )}
           </TabsContent>
 
-          <TabsContent value="submissions" className="space-y-6">
-            <h2 className="text-2xl font-bold">All Submissions</h2>
-            
-            {submissionsList.length === 0 ? (
-              <Card className="p-12 text-center">
-                <Code size={48} className="mx-auto text-muted-foreground mb-4" weight="duotone" />
-                <h3 className="font-semibold mb-2">No submissions yet</h3>
-                <p className="text-sm text-muted-foreground">
-                  Complete experiments to see your submission history
-                </p>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {submissionsList
-                  .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
-                  .map(sub => {
-                    const experiment = experimentsList.find(e => e.id === sub.experimentId)
-                    if (!experiment) return null
-
-                    return (
-                      <Card key={sub.id} className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h3 className="font-semibold text-lg mb-1">{experiment.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Submitted {format(new Date(sub.submittedAt), 'PPP p')}
-                            </p>
-                          </div>
-                          <Badge 
-                            variant={sub.status === 'passed' ? 'default' : 'secondary'}
-                            className={`${sub.status === 'passed' ? 'bg-success text-success-foreground' : 'bg-destructive text-destructive-foreground'} text-lg px-3 py-1`}
-                          >
-                            {sub.score}%
-                          </Badge>
-                        </div>
-
-                        <div className="text-sm mb-4">
-                          <span className="text-muted-foreground">Test Results: </span>
-                          <span className="font-medium">
-                            {sub.testResults.filter(r => r.passed).length} / {sub.testResults.length} passed
-                          </span>
-                        </div>
-
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setSelectedExperiment(experiment)
-                            setViewingSubmission(sub)
-                            setCurrentCode(sub.code)
-                            setActiveTab('experiments')
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </Card>
-                    )
-                  })}
-              </div>
-            )}
+          <TabsContent value="history" className="space-y-6">
+            <h2 className="text-2xl font-bold">Submission History</h2>
+            <SubmissionHistory
+              submissions={submissionsList}
+              problems={problemsList}
+              onViewProblem={handleViewProblem}
+            />
           </TabsContent>
         </Tabs>
       </main>
-
-      <CreateExperimentDialog
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        onSave={handleCreateExperiment}
-      />
     </div>
   )
 }
