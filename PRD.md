@@ -1,6 +1,6 @@
 # Online Judge Programming Practice Platform
 
-A streamlined web-based platform for students to practice programming problems with automatic judging, similar to traditional Online Judge systems.
+一个简化的基于Web的平台，供学生练习编程问题并获得自动评判，类似于传统的在线判题系统。支持中英文双语切换。
 
 **Experience Qualities**:
 1. **Focused** - Clean, distraction-free interface centered on problem-solving and code submission
@@ -46,6 +46,13 @@ This is a student-focused practice platform with core features including problem
 - **Trigger**: Navigate to Dashboard tab
 - **Progression**: View dashboard → See stats (total solved, success rate) → View progress charts → Identify areas to practice
 - **Success criteria**: Accurate statistics; visual charts render correctly; clear progress indicators
+
+### Language Switching
+- **Functionality**: Toggle between Chinese and English interface languages
+- **Purpose**: Support both Chinese and English-speaking students
+- **Trigger**: Click language switcher button in header
+- **Progression**: Click language button → Interface immediately updates to selected language → Preference persists across sessions
+- **Success criteria**: All text updates instantly; user preference is saved; default language is Chinese
 
 ## Edge Case Handling
 

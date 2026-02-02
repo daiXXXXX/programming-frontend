@@ -20,6 +20,9 @@ import { DashboardStats } from '@/components/DashboardStats'
 import { evaluateCode, calculateScore, getSubmissionStatus } from '@/lib/evaluator'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
+import { I18nProvider } from '@/components/I18nProvider'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useI18n } from '@/hooks/use-i18n'
 
 const SAMPLE_PROBLEMS: Problem[] = [
   {
@@ -185,7 +188,8 @@ const SAMPLE_PROBLEMS: Problem[] = [
   }
 ]
 
-function App() {
+function AppContent() {
+  const { t } = useI18n()
   const [problems, setProblems] = useKV<Problem[]>('oj-problems', [])
   const [submissions, setSubmissions] = useKV<Submission[]>('oj-submissions', [])
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -204,7 +208,7 @@ function App() {
   const handleSubmitCode = (problemId: string, code: string) => {
     const problem = problemsList.find(p => p.id === problemId)
     if (!problem || !code.trim()) {
-      toast.error('Please write some code before submitting')
+      toast.error(t.messages.writeCodeFirst)
       return
     }
 
@@ -226,11 +230,11 @@ function App() {
     setSubmissions((current) => [...(current || []), newSubmission])
 
     if (status === 'Accepted') {
-      toast.success(`✓ Accepted! All tests passed. Score: ${score}%`)
+      toast.success(`✓ ${t.messages.allTestsPassed} ${t.history.score}: ${score}%`)
     } else if (status === 'Runtime Error') {
-      toast.error(`✗ Runtime Error. Check your code for errors.`)
+      toast.error(`✗ ${t.messages.runtimeError}`)
     } else {
-      toast.error(`✗ Wrong Answer. ${testResults.filter(r => r.passed).length}/${testResults.length} tests passed.`)
+      toast.error(`✗ ${t.messages.wrongAnswer} ${testResults.filter(r => r.passed).length}/${testResults.length} ${t.messages.testsPassed}`)
     }
 
     return newSubmission
@@ -259,8 +263,8 @@ function App() {
             <div className="flex items-center gap-3">
               <Code size={32} weight="duotone" className="text-primary" />
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">OJ Platform</h1>
-                <p className="text-sm text-muted-foreground">Online Judge Practice System</p>
+                <h1 className="text-2xl font-bold tracking-tight">{t.header.title}</h1>
+                <p className="text-sm text-muted-foreground">{t.header.subtitle}</p>
               </div>
             </div>
 
@@ -268,8 +272,9 @@ function App() {
               <div className="flex items-center gap-2 text-sm">
                 <Trophy size={20} className="text-accent" weight="fill" />
                 <span className="font-semibold">{solvedProblems.size}</span>
-                <span className="text-muted-foreground">Solved</span>
+                <span className="text-muted-foreground">{t.header.solved}</span>
               </div>
+              <LanguageSwitcher />
             </div>
           </div>
         </div>
@@ -280,15 +285,15 @@ function App() {
           <TabsList className="grid w-full max-w-xl grid-cols-3 mb-8">
             <TabsTrigger value="dashboard" className="gap-2">
               <ChartBar size={18} />
-              Dashboard
+              {t.tabs.dashboard}
             </TabsTrigger>
             <TabsTrigger value="problems" className="gap-2">
               <Code size={18} />
-              Problems
+              {t.tabs.problems}
             </TabsTrigger>
             <TabsTrigger value="history" className="gap-2">
               <List size={18} />
-              History
+              {t.tabs.history}
             </TabsTrigger>
           </TabsList>
 
@@ -310,7 +315,7 @@ function App() {
             {!selectedProblem ? (
               <>
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold">Problem Set</h2>
+                  <h2 className="text-2xl font-bold">{t.problems.title}</h2>
                   <div className="flex gap-2">
                     {(['All', 'Easy', 'Medium', 'Hard'] as const).map(level => (
                       <Button
@@ -319,7 +324,7 @@ function App() {
                         size="sm"
                         onClick={() => setFilterDifficulty(level)}
                       >
-                        {level}
+                        {level === 'All' ? t.problems.all : level === 'Easy' ? t.problems.easy : level === 'Medium' ? t.problems.medium : t.problems.hard}
                       </Button>
                     ))}
                   </div>
@@ -341,7 +346,7 @@ function App() {
           </TabsContent>
 
           <TabsContent value="history" className="space-y-6">
-            <h2 className="text-2xl font-bold">Submission History</h2>
+            <h2 className="text-2xl font-bold">{t.history.title}</h2>
             <SubmissionHistory
               submissions={submissionsList}
               problems={problemsList}
@@ -351,6 +356,14 @@ function App() {
         </Tabs>
       </main>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <I18nProvider>
+      <AppContent />
+    </I18nProvider>
   )
 }
 

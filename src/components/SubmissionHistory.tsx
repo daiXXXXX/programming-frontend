@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { CheckCircle, XCircle, Code as CodeIcon } from '@phosphor-icons/react'
 import { format } from 'date-fns'
+import { useI18n } from '@/hooks/use-i18n'
 
 interface SubmissionHistoryProps {
   submissions: Submission[]
@@ -13,13 +14,15 @@ interface SubmissionHistoryProps {
 }
 
 export function SubmissionHistory({ submissions, problems, onViewProblem }: SubmissionHistoryProps) {
+  const { t } = useI18n()
+  
   if (submissions.length === 0) {
     return (
       <Card className="p-12 text-center">
         <CodeIcon size={48} className="mx-auto text-muted-foreground mb-4" weight="duotone" />
-        <h3 className="font-semibold mb-2">No submissions yet</h3>
+        <h3 className="font-semibold mb-2">{t.history.noSubmissions}</h3>
         <p className="text-sm text-muted-foreground">
-          Start solving problems to see your submission history
+          {t.dashboard.noActivity}
         </p>
       </Card>
     )
@@ -51,17 +54,30 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
     }
   }
 
+  const getStatusText = (status: Submission['status']) => {
+    switch (status) {
+      case 'Accepted':
+        return t.status.accepted
+      case 'Wrong Answer':
+        return t.status.wrongAnswer
+      case 'Runtime Error':
+        return t.status.runtimeError
+      default:
+        return t.status.pending
+    }
+  }
+
   return (
     <Card>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Problem</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Score</TableHead>
-            <TableHead>Language</TableHead>
-            <TableHead>Submitted At</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead>{t.history.problem}</TableHead>
+            <TableHead>{t.history.status}</TableHead>
+            <TableHead>{t.history.score}</TableHead>
+            <TableHead>{t.history.language}</TableHead>
+            <TableHead>{t.history.submittedAt}</TableHead>
+            <TableHead>{t.history.view}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -76,7 +92,7 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
                   <div className="flex items-center gap-2">
                     {getStatusIcon(submission.status)}
                     <Badge className={getStatusColor(submission.status)}>
-                      {submission.status}
+                      {getStatusText(submission.status)}
                     </Badge>
                   </div>
                 </TableCell>
@@ -95,7 +111,7 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
                     size="sm"
                     onClick={() => onViewProblem(problem)}
                   >
-                    View
+                    {t.history.view}
                   </Button>
                 </TableCell>
               </TableRow>

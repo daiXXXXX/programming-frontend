@@ -14,6 +14,7 @@ import {
 } from '@phosphor-icons/react'
 import { format } from 'date-fns'
 import { motion } from 'framer-motion'
+import { useI18n } from '@/hooks/use-i18n'
 
 interface ProblemDetailProps {
   problem: Problem
@@ -23,6 +24,7 @@ interface ProblemDetailProps {
 }
 
 export function ProblemDetail({ problem, submissions, onBack, onSubmit }: ProblemDetailProps) {
+  const { t } = useI18n()
   const [code, setCode] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [lastSubmission, setLastSubmission] = useState<Submission | null>(null)
@@ -70,7 +72,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
       <div className="flex items-center gap-4">
         <Button variant="outline" onClick={onBack} className="gap-2">
           <ArrowLeft size={18} />
-          Back
+          {t.problemDetail.backToList}
         </Button>
         <h2 className="text-2xl font-bold">{problem.title}</h2>
       </div>
@@ -78,24 +80,24 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
           <Card className="p-6">
-            <h3 className="font-semibold text-lg mb-4">Problem Description</h3>
+            <h3 className="font-semibold text-lg mb-4">{t.problemDetail.description}</h3>
             <p className="text-sm leading-relaxed mb-4">{problem.description}</p>
 
             <Separator className="my-4" />
 
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium text-sm mb-2">Input Format</h4>
+                <h4 className="font-medium text-sm mb-2">{t.problemDetail.inputFormat}</h4>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">{problem.inputFormat}</p>
               </div>
 
               <div>
-                <h4 className="font-medium text-sm mb-2">Output Format</h4>
+                <h4 className="font-medium text-sm mb-2">{t.problemDetail.outputFormat}</h4>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">{problem.outputFormat}</p>
               </div>
 
               <div>
-                <h4 className="font-medium text-sm mb-2">Constraints</h4>
+                <h4 className="font-medium text-sm mb-2">{t.problemDetail.constraints}</h4>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">{problem.constraints}</p>
               </div>
             </div>
@@ -103,22 +105,22 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
             <Separator className="my-4" />
 
             <div>
-              <h4 className="font-medium text-sm mb-3">Examples</h4>
+              <h4 className="font-medium text-sm mb-3">{t.problemDetail.examples}</h4>
               <div className="space-y-4">
                 {problem.examples.map((example, idx) => (
                   <Card key={idx} className="p-4 bg-muted/30">
                     <div className="space-y-2">
                       <div>
-                        <div className="text-xs font-medium text-muted-foreground mb-1">Input:</div>
+                        <div className="text-xs font-medium text-muted-foreground mb-1">{t.problemDetail.input}:</div>
                         <pre className="text-sm font-mono bg-background p-2 rounded">{example.input}</pre>
                       </div>
                       <div>
-                        <div className="text-xs font-medium text-muted-foreground mb-1">Output:</div>
+                        <div className="text-xs font-medium text-muted-foreground mb-1">{t.problemDetail.output}:</div>
                         <pre className="text-sm font-mono bg-background p-2 rounded">{example.output}</pre>
                       </div>
                       {example.explanation && (
                         <div>
-                          <div className="text-xs font-medium text-muted-foreground mb-1">Explanation:</div>
+                          <div className="text-xs font-medium text-muted-foreground mb-1">{t.problemDetail.explanation}:</div>
                           <p className="text-xs text-muted-foreground">{example.explanation}</p>
                         </div>
                       )}
@@ -130,9 +132,9 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
           </Card>
 
           <Card className="p-6">
-            <h3 className="font-semibold text-lg mb-4">Recent Submissions</h3>
+            <h3 className="font-semibold text-lg mb-4">{t.problemDetail.recentSubmissions}</h3>
             {recentSubmissions.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No submissions yet</p>
+              <p className="text-sm text-muted-foreground text-center py-4">{t.problemDetail.noSubmissions}</p>
             ) : (
               <div className="space-y-2">
                 {recentSubmissions.map(sub => (
@@ -161,16 +163,11 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
 
         <div className="space-y-6">
           <Card className="p-6">
-            <h3 className="font-semibold text-lg mb-4">Code Editor</h3>
+            <h3 className="font-semibold text-lg mb-4">{t.problemDetail.yourCode}</h3>
             <Textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder={`// Write your solution here
-// Example:
-function processInput(input) {
-  // Your code here
-  return result
-}`}
+              placeholder={t.problemDetail.writeCodeHere}
               className="font-mono text-sm min-h-[400px] resize-y"
               id="code-editor"
             />
@@ -181,7 +178,7 @@ function processInput(input) {
               size="lg"
             >
               <Play size={20} weight="fill" />
-              {isSubmitting ? 'Submitting...' : 'Submit Solution'}
+              {isSubmitting ? t.problemDetail.submitting : t.problemDetail.submit}
             </Button>
           </Card>
 
@@ -192,21 +189,21 @@ function processInput(input) {
               transition={{ duration: 0.3 }}
             >
               <Card className="p-6">
-                <h3 className="font-semibold text-lg mb-4">Test Results</h3>
+                <h3 className="font-semibold text-lg mb-4">{t.problemDetail.testResults}</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Overall Status</span>
+                    <span className="text-sm font-medium">{t.history.status}</span>
                     <Badge className={getStatusColor(lastSubmission.status)}>
                       {lastSubmission.status}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Score</span>
+                    <span className="text-sm font-medium">{t.history.score}</span>
                     <span className="text-lg font-bold">{lastSubmission.score}%</span>
                   </div>
                   <Separator />
                   <div>
-                    <div className="text-sm font-medium mb-2">Test Cases</div>
+                    <div className="text-sm font-medium mb-2">{t.problemDetail.testCase}</div>
                     <div className="space-y-2">
                       {lastSubmission.testResults.map((result, idx) => (
                         <div 
@@ -219,7 +216,7 @@ function processInput(input) {
                             ) : (
                               <XCircle size={16} weight="fill" className="text-destructive" />
                             )}
-                            <span className="text-sm">Test Case {idx + 1}</span>
+                            <span className="text-sm">{t.problemDetail.testCase} {idx + 1}</span>
                           </div>
                           {result.executionTime !== undefined && (
                             <span className="text-xs text-muted-foreground">{result.executionTime}ms</span>

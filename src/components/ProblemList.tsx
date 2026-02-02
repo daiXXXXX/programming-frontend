@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, Fire } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
+import { useI18n } from '@/hooks/use-i18n'
 
 interface ProblemListProps {
   problems: Problem[]
@@ -17,13 +18,15 @@ const difficultyColors: Record<DifficultyLevel, string> = {
 }
 
 export function ProblemList({ problems, solvedProblems, onSelectProblem }: ProblemListProps) {
+  const { t } = useI18n()
+  
   if (problems.length === 0) {
     return (
       <Card className="p-12 text-center">
         <Fire size={48} className="mx-auto text-muted-foreground mb-4" weight="duotone" />
-        <h3 className="font-semibold mb-2">No problems available</h3>
+        <h3 className="font-semibold mb-2">{t.problems.noProblems}</h3>
         <p className="text-sm text-muted-foreground">
-          Check back later for new problems
+          {t.dashboard.noActivity}
         </p>
       </Card>
     )

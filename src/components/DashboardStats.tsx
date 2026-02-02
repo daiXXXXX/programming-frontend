@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Trophy, CheckCircle, Fire, TrendUp } from '@phosphor-icons/react'
 import * as echarts from 'echarts'
 import { motion } from 'framer-motion'
+import { useI18n } from '@/hooks/use-i18n'
 
 interface DashboardStatsProps {
   problems: Problem[]
@@ -13,6 +14,7 @@ interface DashboardStatsProps {
 }
 
 export function DashboardStats({ problems, submissions, onViewProblem }: DashboardStatsProps) {
+  const { t } = useI18n()
   const chartRef = useRef<HTMLDivElement>(null)
   const pieChartRef = useRef<HTMLDivElement>(null)
 
@@ -55,7 +57,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
 
     const option = {
       title: {
-        text: 'Submission Activity',
+        text: t.dashboard.recentActivity,
         textStyle: {
           fontSize: 16,
           fontWeight: 600,
@@ -114,7 +116,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
     
     const option = {
       title: {
-        text: 'Problems by Difficulty',
+        text: t.dashboard.difficultyBreakdown,
         textStyle: {
           fontSize: 16,
           fontWeight: 600,
@@ -150,9 +152,9 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           }
         },
         data: [
-          { value: easySolved, name: 'Easy', itemStyle: { color: '#52C41A' } },
-          { value: mediumSolved, name: 'Medium', itemStyle: { color: '#FAAD14' } },
-          { value: hardSolved, name: 'Hard', itemStyle: { color: '#FF4D4F' } }
+          { value: easySolved, name: t.dashboard.easy, itemStyle: { color: '#52C41A' } },
+          { value: mediumSolved, name: t.dashboard.medium, itemStyle: { color: '#FAAD14' } },
+          { value: hardSolved, name: t.dashboard.hard, itemStyle: { color: '#FF4D4F' } }
         ].filter(item => item.value > 0)
       }]
     }
@@ -194,10 +196,10 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
             <div className="flex items-center gap-3 mb-2">
               <Trophy size={24} weight="fill" className="text-primary" />
-              <span className="text-sm font-medium text-muted-foreground">Total Solved</span>
+              <span className="text-sm font-medium text-muted-foreground">{t.dashboard.totalProblems}</span>
             </div>
             <div className="text-3xl font-bold">{totalSolved}</div>
-            <div className="text-xs text-muted-foreground mt-1">out of {totalProblems} problems</div>
+            <div className="text-xs text-muted-foreground mt-1">{totalProblems} {t.problems.title}</div>
           </Card>
         </motion.div>
 
@@ -209,10 +211,10 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           <Card className="p-6 bg-gradient-to-br from-success/10 to-success/5 border-success/20">
             <div className="flex items-center gap-3 mb-2">
               <CheckCircle size={24} weight="fill" className="text-success" />
-              <span className="text-sm font-medium text-muted-foreground">Easy</span>
+              <span className="text-sm font-medium text-muted-foreground">{t.dashboard.easy}</span>
             </div>
             <div className="text-3xl font-bold">{easySolved}</div>
-            <div className="text-xs text-muted-foreground mt-1">out of {easyTotal}</div>
+            <div className="text-xs text-muted-foreground mt-1">{easyTotal}</div>
           </Card>
         </motion.div>
 
@@ -224,10 +226,10 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           <Card className="p-6 bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20">
             <div className="flex items-center gap-3 mb-2">
               <Fire size={24} weight="fill" className="text-warning" />
-              <span className="text-sm font-medium text-muted-foreground">Medium</span>
+              <span className="text-sm font-medium text-muted-foreground">{t.dashboard.medium}</span>
             </div>
             <div className="text-3xl font-bold">{mediumSolved}</div>
-            <div className="text-xs text-muted-foreground mt-1">out of {mediumTotal}</div>
+            <div className="text-xs text-muted-foreground mt-1">{mediumTotal}</div>
           </Card>
         </motion.div>
 
@@ -239,10 +241,10 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           <Card className="p-6 bg-gradient-to-br from-destructive/10 to-destructive/5 border-destructive/20">
             <div className="flex items-center gap-3 mb-2">
               <TrendUp size={24} weight="fill" className="text-destructive" />
-              <span className="text-sm font-medium text-muted-foreground">Hard</span>
+              <span className="text-sm font-medium text-muted-foreground">{t.dashboard.hard}</span>
             </div>
             <div className="text-3xl font-bold">{hardSolved}</div>
-            <div className="text-xs text-muted-foreground mt-1">out of {hardTotal}</div>
+            <div className="text-xs text-muted-foreground mt-1">{hardTotal}</div>
           </Card>
         </motion.div>
       </div>
@@ -259,7 +261,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
 
       {recentlySolved.length > 0 && (
         <Card className="p-6">
-          <h3 className="font-semibold text-lg mb-4">Recently Solved</h3>
+          <h3 className="font-semibold text-lg mb-4">{t.dashboard.recentActivity}</h3>
           <div className="space-y-2">
             {recentlySolved.map(problem => (
               <div
@@ -281,9 +283,9 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
       {problems.length > 0 && totalSolved === 0 && (
         <Card className="p-12 text-center bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20">
           <Fire size={48} className="mx-auto text-accent mb-4" weight="duotone" />
-          <h3 className="font-semibold text-lg mb-2">Start Your Journey!</h3>
+          <h3 className="font-semibold text-lg mb-2">{t.dashboard.quickStart}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            {problems.length} problems are waiting for you. Start solving to see your progress here.
+            {problems.length} {t.dashboard.startPracticing}
           </p>
         </Card>
       )}
