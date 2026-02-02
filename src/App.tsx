@@ -14,13 +14,17 @@ import {
   Flask, 
   Code, 
   ListBullets,
-  Play 
+  Play,
+  ChartLine
 } from '@phosphor-icons/react'
 import { Experiment, Submission, UserRole } from '@/lib/types'
 import { ExperimentCard } from '@/components/ExperimentCard'
 import { CreateExperimentDialog } from '@/components/CreateExperimentDialog'
 import { CodeEditor } from '@/components/CodeEditor'
 import { TestResultPanel } from '@/components/TestResultPanel'
+import { AnalyticsCharts } from '@/components/AnalyticsCharts'
+import { StudentProgressTable } from '@/components/StudentProgressTable'
+import { InstructorAnalytics } from '@/components/InstructorAnalytics'
 import { evaluateCode, calculateScore, getSubmissionStatus } from '@/lib/evaluator'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
@@ -147,10 +151,14 @@ function App() {
 
       <main className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-md grid-cols-3 mb-8">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4 mb-8">
             <TabsTrigger value="dashboard" className="gap-2">
               <ChartBar size={18} />
               Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="gap-2">
+              <ChartLine size={18} />
+              Analytics
             </TabsTrigger>
             <TabsTrigger value="experiments" className="gap-2">
               <Flask size={18} />
@@ -227,6 +235,51 @@ function App() {
                 </div>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold">
+                    {role === 'instructor' ? 'Class Analytics' : 'Performance Analytics'}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {role === 'instructor' 
+                      ? 'Monitor class progress and identify areas for improvement'
+                      : 'Track your progress and identify areas for improvement'
+                    }
+                  </p>
+                </div>
+              </div>
+
+              {role === 'instructor' ? (
+                <InstructorAnalytics 
+                  experiments={experimentsList} 
+                  submissions={submissionsList}
+                />
+              ) : (
+                <>
+                  <AnalyticsCharts 
+                    experiments={experimentsList} 
+                    submissions={submissionsList} 
+                  />
+
+                  <div className="mt-8">
+                    <h3 className="text-xl font-semibold mb-4">Detailed Progress</h3>
+                    <StudentProgressTable
+                      experiments={experimentsList}
+                      submissions={submissionsList}
+                      onViewExperiment={handleViewExperiment}
+                    />
+                  </div>
+                </>
+              )}
+            </motion.div>
           </TabsContent>
 
           <TabsContent value="experiments" className="space-y-6">

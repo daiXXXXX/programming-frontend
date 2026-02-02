@@ -54,6 +54,13 @@ This is a multi-user educational platform with distinct roles (instructor/studen
 - **Progression**: Select experiment → View history panel → See list of submissions with dates and scores → Click to view code
 - **Success criteria**: All submissions are logged; chronological ordering; can view code from any past submission
 
+### Analytics Dashboard
+- **Functionality**: Comprehensive visual analytics with charts showing progress over time, performance by experiment, score distribution, and improvement trends
+- **Purpose**: Provide data-driven insights to help students and instructors identify patterns, track improvement, and make informed decisions
+- **Trigger**: Navigate to Analytics tab
+- **Progression**: View Analytics → See overview stats (avg score, pass rate, trends) → Examine progress charts → Review detailed performance table → Identify strengths and weaknesses
+- **Success criteria**: Charts render correctly with real-time data; trend indicators show improvement/decline; detailed table shows all experiments with sortable metrics; empty state guides new users
+
 ## Edge Case Handling
 
 - **Empty States**: Display helpful onboarding messages when no experiments exist, guiding instructors to create first experiment and students to check back later
