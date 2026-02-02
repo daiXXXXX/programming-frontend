@@ -27,12 +27,12 @@ import { useI18n } from '@/hooks/use-i18n'
 const SAMPLE_PROBLEMS: Problem[] = [
   {
     id: '1',
-    title: 'Two Sum',
+    title: '两数之和',
     difficulty: 'Easy',
-    description: 'Given an array of integers and a target sum, return indices of the two numbers that add up to the target.',
-    inputFormat: 'First line: array of integers separated by spaces\nSecond line: target integer',
-    outputFormat: 'Two space-separated integers representing the indices (0-indexed)',
-    constraints: '• 2 ≤ array length ≤ 10⁴\n• -10⁹ ≤ array[i] ≤ 10⁹\n• Only one valid answer exists',
+    description: '给定一个整数数组和一个目标和，返回两个数字的索引，使它们相加等于目标值。',
+    inputFormat: '第一行：用空格分隔的整数数组\n第二行：目标整数',
+    outputFormat: '两个用空格分隔的整数，表示索引（从0开始）',
+    constraints: '• 2 ≤ 数组长度 ≤ 10⁴\n• -10⁹ ≤ array[i] ≤ 10⁹\n• 只存在一个有效答案',
     examples: [
       {
         input: '2 7 11 15\n9',
@@ -50,22 +50,22 @@ const SAMPLE_PROBLEMS: Problem[] = [
       { id: 't2', input: '3 2 4\n6', expectedOutput: '1 2' },
       { id: 't3', input: '3 3\n6', expectedOutput: '0 1' }
     ],
-    tags: ['Array', 'Hash Table'],
+    tags: ['数组', '哈希表'],
     createdAt: new Date().toISOString()
   },
   {
     id: '2',
-    title: 'Reverse String',
+    title: '反转字符串',
     difficulty: 'Easy',
-    description: 'Write a function that reverses a string. The input string is given as an array of characters.',
-    inputFormat: 'A single line containing a string',
-    outputFormat: 'The reversed string',
-    constraints: '• 1 ≤ string length ≤ 10⁵\n• String consists of printable ASCII characters',
+    description: '编写一个函数来反转字符串。输入字符串以字符数组的形式给出。',
+    inputFormat: '一行包含一个字符串',
+    outputFormat: '反转后的字符串',
+    constraints: '• 1 ≤ 字符串长度 ≤ 10⁵\n• 字符串由可打印的ASCII字符组成',
     examples: [
       {
         input: 'hello',
         output: 'olleh',
-        explanation: 'The string "hello" reversed is "olleh"'
+        explanation: '字符串 "hello" 反转后是 "olleh"'
       },
       {
         input: 'world',
@@ -77,22 +77,22 @@ const SAMPLE_PROBLEMS: Problem[] = [
       { id: 't2', input: 'world', expectedOutput: 'dlrow' },
       { id: 't3', input: 'a', expectedOutput: 'a' }
     ],
-    tags: ['String', 'Two Pointers'],
+    tags: ['字符串', '双指针'],
     createdAt: new Date().toISOString()
   },
   {
     id: '3',
-    title: 'Valid Palindrome',
+    title: '有效的回文串',
     difficulty: 'Easy',
-    description: 'Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.',
-    inputFormat: 'A single line containing a string',
-    outputFormat: 'true if palindrome, false otherwise',
-    constraints: '• 1 ≤ string length ≤ 2 × 10⁵\n• String consists of printable ASCII characters',
+    description: '给定一个字符串，判断它是否是回文串，只考虑字母和数字字符，并忽略大小写。',
+    inputFormat: '一行包含一个字符串',
+    outputFormat: '如果是回文串返回 true，否则返回 false',
+    constraints: '• 1 ≤ 字符串长度 ≤ 2 × 10⁵\n• 字符串由可打印的ASCII字符组成',
     examples: [
       {
         input: 'A man, a plan, a canal: Panama',
         output: 'true',
-        explanation: 'After removing non-alphanumeric and ignoring case: "amanaplanacanalpanama" is a palindrome'
+        explanation: '移除非字母数字字符并忽略大小写后："amanaplanacanalpanama" 是回文串'
       },
       {
         input: 'race a car',
@@ -104,22 +104,22 @@ const SAMPLE_PROBLEMS: Problem[] = [
       { id: 't2', input: 'race a car', expectedOutput: 'false' },
       { id: 't3', input: 'a', expectedOutput: 'true' }
     ],
-    tags: ['String', 'Two Pointers'],
+    tags: ['字符串', '双指针'],
     createdAt: new Date().toISOString()
   },
   {
     id: '4',
-    title: 'Maximum Subarray',
+    title: '最大子数组',
     difficulty: 'Medium',
-    description: 'Given an integer array, find the contiguous subarray with the largest sum and return its sum.',
-    inputFormat: 'Space-separated integers representing the array',
-    outputFormat: 'A single integer representing the maximum sum',
-    constraints: '• 1 ≤ array length ≤ 10⁵\n• -10⁴ ≤ array[i] ≤ 10⁴',
+    description: '给定一个整数数组，找到具有最大和的连续子数组并返回其和。',
+    inputFormat: '用空格分隔的整数，表示数组',
+    outputFormat: '一个整数，表示最大和',
+    constraints: '• 1 ≤ 数组长度 ≤ 10⁵\n• -10⁴ ≤ array[i] ≤ 10⁴',
     examples: [
       {
         input: '-2 1 -3 4 -1 2 1 -5 4',
         output: '6',
-        explanation: 'The subarray [4,-1,2,1] has the largest sum = 6'
+        explanation: '子数组 [4,-1,2,1] 的和最大 = 6'
       },
       {
         input: '1',
@@ -131,17 +131,17 @@ const SAMPLE_PROBLEMS: Problem[] = [
       { id: 't2', input: '1', expectedOutput: '1' },
       { id: 't3', input: '5 4 -1 7 8', expectedOutput: '23' }
     ],
-    tags: ['Array', 'Dynamic Programming'],
+    tags: ['数组', '动态规划'],
     createdAt: new Date().toISOString()
   },
   {
     id: '5',
-    title: 'Merge Sorted Arrays',
+    title: '合并两个有序数组',
     difficulty: 'Medium',
-    description: 'Given two sorted integer arrays, merge them into a single sorted array.',
-    inputFormat: 'First line: first sorted array (space-separated integers)\nSecond line: second sorted array (space-separated integers)',
-    outputFormat: 'Space-separated integers representing the merged sorted array',
-    constraints: '• 0 ≤ array length ≤ 1000\n• -10⁶ ≤ array[i] ≤ 10⁶',
+    description: '给定两个有序整数数组，将它们合并成一个有序数组。',
+    inputFormat: '第一行：第一个有序数组（用空格分隔的整数）\n第二行：第二个有序数组（用空格分隔的整数）',
+    outputFormat: '用空格分隔的整数，表示合并后的有序数组',
+    constraints: '• 0 ≤ 数组长度 ≤ 1000\n• -10⁶ ≤ array[i] ≤ 10⁶',
     examples: [
       {
         input: '1 3 5\n2 4 6',
@@ -157,17 +157,17 @@ const SAMPLE_PROBLEMS: Problem[] = [
       { id: 't2', input: '1\n2', expectedOutput: '1 2' },
       { id: 't3', input: '1 2 3\n4 5 6', expectedOutput: '1 2 3 4 5 6' }
     ],
-    tags: ['Array', 'Two Pointers'],
+    tags: ['数组', '双指针'],
     createdAt: new Date().toISOString()
   },
   {
     id: '6',
-    title: 'Binary Search',
+    title: '二分查找',
     difficulty: 'Easy',
-    description: 'Given a sorted array and a target value, return the index if the target is found. If not, return -1.',
-    inputFormat: 'First line: sorted array (space-separated integers)\nSecond line: target integer',
-    outputFormat: 'Index of target (0-indexed) or -1 if not found',
-    constraints: '• 1 ≤ array length ≤ 10⁴\n• -10⁴ ≤ array[i], target ≤ 10⁴\n• All elements are unique',
+    description: '给定一个有序数组和一个目标值，如果找到目标值则返回其索引，否则返回 -1。',
+    inputFormat: '第一行：有序数组（用空格分隔的整数）\n第二行：目标整数',
+    outputFormat: '目标值的索引（从0开始）或 -1（如果未找到）',
+    constraints: '• 1 ≤ 数组长度 ≤ 10⁴\n• -10⁴ ≤ array[i], target ≤ 10⁴\n• 所有元素都是唯一的',
     examples: [
       {
         input: '1 2 3 4 5\n3',
@@ -183,7 +183,7 @@ const SAMPLE_PROBLEMS: Problem[] = [
       { id: 't2', input: '1 2 3 4 5\n6', expectedOutput: '-1' },
       { id: 't3', input: '1\n1', expectedOutput: '0' }
     ],
-    tags: ['Array', 'Binary Search'],
+    tags: ['数组', '二分查找'],
     createdAt: new Date().toISOString()
   }
 ]
