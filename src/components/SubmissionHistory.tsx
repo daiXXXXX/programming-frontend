@@ -1,3 +1,5 @@
+'use client'
+
 import { Problem, Submission } from '@/lib/api'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'

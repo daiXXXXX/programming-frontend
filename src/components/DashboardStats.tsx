@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef } from 'react'
 import { Problem, Submission } from '@/lib/api'
 import { Card } from '@/components/ui/card'

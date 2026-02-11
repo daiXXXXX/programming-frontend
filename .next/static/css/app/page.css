@@ -1,0 +1,107 @@
+/*!*******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./src/app/page.module.css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************/
+/* 页面级别的CSS样式，使用CSS Modules
+   类名会被自动哈希处理 */
+
+.page_container__aoG4z {
+  min-height: 100vh;
+}
+
+.page_container__aoG4z.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.page_header__kVzhN {
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.page_headerLogo__g8RW4 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.page_headerLogoIcon__EY3vS {
+  color: oklch(0.45 0.15 250);
+}
+
+.page_headerLogoTitle__jV11F {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.page_headerLogoSubtitle__53mRK {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.page_headerStats__s11iw {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page_headerStatsTrophy__50EM0 {
+  color: oklch(0.65 0.18 200);
+}
+
+.page_headerStatsCount__imE4X {
+  font-weight: 600;
+}
+
+.page_main__GlU4n {
+  padding: 2rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .page_main__GlU4n {
+    padding: 2rem;
+  }
+}
+
+.page_tabsContainer__3QZNv {
+  margin-bottom: 2rem;
+}
+
+.page_tabTrigger__SuKjG {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page_problemsHeader__ut30c {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.page_problemsHeaderTitle___ljmJ {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.page_problemsHeaderFilters__sN96m {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.page_animated__8O9GF {
+  animation: page_fadeIn__wvzG6 0.3s ease-out;
+}
+
+@keyframes page_fadeIn__wvzG6 {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

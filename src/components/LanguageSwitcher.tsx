@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { useI18n } from '@/hooks/use-i18n'
 import { Translate } from '@phosphor-icons/react'

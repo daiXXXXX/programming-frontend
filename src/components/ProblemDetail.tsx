@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { Problem, Submission } from '@/lib/api'
 import { Card } from '@/components/ui/card'

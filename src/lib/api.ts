@@ -1,5 +1,6 @@
-// API 配置
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
+// API 配置 - Next.js版本
+// 在Next.js中，API请求会通过rewrites代理到后端
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api'
 
 // 默认用户ID（在实现登录功能前使用）
 const DEFAULT_USER_ID = 1
