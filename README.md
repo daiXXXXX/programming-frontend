@@ -6,10 +6,10 @@
 
 - **框架**: Next.js 14 (App Router)
 - **样式**: Tailwind CSS + Less + CSS Modules
-- **UI组件**: Radix UI + shadcn/ui
-- **状态管理**: React Query
+- **UI组件**: Ant Design 5.x + @ant-design/icons
+- **状态管理**: Zustand (持久化) + 自定义 Hooks + Context
 - **动画**: Framer Motion
-- **图表**: ECharts / Recharts
+- **图表**: ECharts
 - **国际化**: 自定义 i18n 方案
 
 ## 快速开始
@@ -42,20 +42,64 @@ src/
 ├── app/                 # Next.js App Router 页面
 │   ├── layout.tsx       # 根布局
 │   ├── page.tsx         # 首页
-│   ├── providers.tsx    # 全局 Providers
+│   ├── providers.tsx    # 全局 Providers (Ant Design ConfigProvider)
 │   └── globals.css      # 全局样式
 ├── components/          # React 组件
-│   ├── ui/              # UI 基础组件 (shadcn/ui)
-│   └── *.tsx            # 业务组件
+│   └── *.tsx            # 业务组件 (使用 Ant Design)
 ├── hooks/               # 自定义 Hooks
+│   ├── use-problems.ts  # 问题数据管理
+│   ├── use-submissions.ts # 提交管理
+│   ├── use-ui-state.ts  # UI 状态管理
+│   ├── use-i18n.ts      # 国际化
+│   └── index.ts         # 统一导出
+├── store/               # 状态管理
+│   └── appStore.ts      # Zustand 全局状态 (带持久化)
 ├── lib/                 # 工具库
 │   ├── api.ts           # API 客户端
+│   ├── antd-theme.ts    # Ant Design 主题配置
 │   ├── i18n.ts          # 国际化配置
 │   ├── types.ts         # 类型定义
 │   └── utils.ts         # 工具函数
-├── styles/              # 样式文件
-│   └── variables.less   # Less 变量和混合
-└── types/               # TypeScript 类型声明
+└── styles/              # 样式文件
+    └── theme.css        # 主题变量
+```
+
+## 状态管理
+
+### Zustand 全局缓存
+
+使用 Zustand 实现带持久化的全局状态管理：
+
+```tsx
+// store/appStore.ts
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+export const useAppStore = create(
+  persist(
+    (set, get) => ({
+      problems: [],
+      submissions: [],
+      // ...
+    }),
+    { name: "app-storage" },
+  ),
+);
+```
+
+### 自定义 Hooks
+
+业务逻辑封装在自定义 Hooks 中：
+
+```tsx
+import { useProblems, useSubmissions, useUIState } from "@/hooks";
+
+export function MyComponent() {
+  const { problems, loading, refresh } = useProblems();
+  const { submitCode, getProblemSubmissions } = useSubmissions();
+  const { selectProblem, getSelectedProblem } = useUIState();
+  // ...
+}
 ```
 
 ## 样式系统
@@ -77,32 +121,23 @@ export function Component() {
 }
 ```
 
-```less
-// Component.module.less
-@import "../styles/variables.less";
+### Ant Design 主题
 
-.container {
-  padding: @spacing-lg;
-  .shadow-md();
-}
-```
+通过 ConfigProvider 配置 Ant Design 主题：
 
-### CSS 变量
-
-主题色彩通过 CSS 变量定义，支持暗色模式：
-
-```css
-:root {
-  --primary: oklch(0.45 0.15 250);
-  --background: oklch(0.99 0.005 260);
-  /* ... */
+```tsx
+// lib/antd-theme.ts
+export const antdTheme = {
+  token: {
+    colorPrimary: '#1677ff',
+    borderRadius: 6,
+  },
 }
 
-.dark {
-  --primary: oklch(0.55 0.15 250);
-  --background: oklch(0.15 0.02 260);
-  /* ... */
-}
+// app/providers.tsx
+<ConfigProvider theme={antdTheme}>
+  {children}
+</ConfigProvider>
 ```
 
 ## API 代理
@@ -156,10 +191,11 @@ export default function ProblemPage({ params }: { params: { id: string } }) {
 "use client";
 
 import { useState } from "react";
+import { Button } from "antd";
 
 export function Counter() {
   const [count, setCount] = useState(0);
-  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+  return <Button onClick={() => setCount(count + 1)}>{count}</Button>;
 }
 ```
 

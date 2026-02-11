@@ -1,13 +1,13 @@
 'use client'
 
 import { Problem, Submission } from '@/lib/api'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { CheckCircle, XCircle, Code as CodeIcon } from '@phosphor-icons/react'
+import { Card, Table, Tag, Button, Empty, Typography } from 'antd'
+import { CheckCircleFilled, CloseCircleFilled, CodeOutlined } from '@ant-design/icons'
 import { format } from 'date-fns'
 import { useI18n } from '@/hooks/use-i18n'
+import type { ColumnsType } from 'antd/es/table'
+
+const { Text, Title } = Typography
 
 interface SubmissionHistoryProps {
   submissions: Submission[]
@@ -20,12 +20,16 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
   
   if (submissions.length === 0) {
     return (
-      <Card className="p-12 text-center">
-        <CodeIcon size={48} className="mx-auto text-muted-foreground mb-4" weight="duotone" />
-        <h3 className="font-semibold mb-2">{t.history.noSubmissions}</h3>
-        <p className="text-sm text-muted-foreground">
-          {t.dashboard.noActivity}
-        </p>
+      <Card>
+        <Empty
+          image={<CodeOutlined style={{ fontSize: 48, color: '#999' }} />}
+          description={
+            <div>
+              <Title level={5}>{t.history.noSubmissions}</Title>
+              <Text type="secondary">{t.dashboard.noActivity}</Text>
+            </div>
+          }
+        />
       </Card>
     )
   }
@@ -37,22 +41,22 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
   const getStatusIcon = (status: Submission['status']) => {
     switch (status) {
       case 'Accepted':
-        return <CheckCircle size={18} weight="fill" className="text-success" />
+        return <CheckCircleFilled style={{ color: '#52c41a' }} />
       default:
-        return <XCircle size={18} weight="fill" className="text-destructive" />
+        return <CloseCircleFilled style={{ color: '#ff4d4f' }} />
     }
   }
 
-  const getStatusColor = (status: Submission['status']) => {
+  const getStatusColor = (status: Submission['status']): string => {
     switch (status) {
       case 'Accepted':
-        return 'bg-success/10 text-success border-success/20'
+        return 'green'
       case 'Wrong Answer':
-        return 'bg-destructive/10 text-destructive border-destructive/20'
+        return 'red'
       case 'Runtime Error':
-        return 'bg-warning/10 text-warning border-warning/20'
+        return 'orange'
       default:
-        return 'bg-muted text-muted-foreground'
+        return 'default'
     }
   }
 
@@ -69,58 +73,76 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
     }
   }
 
+  interface TableRecord extends Submission {
+    problem?: Problem
+  }
+
+  const columns: ColumnsType<TableRecord> = [
+    {
+      title: t.history.problem,
+      dataIndex: 'problemId',
+      key: 'problem',
+      render: (_, record) => <Text strong>{record.problem?.title || '-'}</Text>,
+    },
+    {
+      title: t.history.status,
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: Submission['status']) => (
+        <span className="flex items-center gap-2">
+          {getStatusIcon(status)}
+          <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
+        </span>
+      ),
+    },
+    {
+      title: t.history.score,
+      dataIndex: 'score',
+      key: 'score',
+      render: (score: number) => <Text strong>{score}%</Text>,
+    },
+    {
+      title: t.history.language,
+      dataIndex: 'language',
+      key: 'language',
+      render: (language: string) => <Tag>{language}</Tag>,
+    },
+    {
+      title: t.history.submittedAt,
+      dataIndex: 'submittedAt',
+      key: 'submittedAt',
+      render: (submittedAt: string) => (
+        <Text type="secondary">{format(new Date(submittedAt), 'MMM d, yyyy HH:mm')}</Text>
+      ),
+    },
+    {
+      title: t.history.view,
+      key: 'action',
+      render: (_, record) => (
+        <Button 
+          type="link" 
+          size="small"
+          onClick={() => record.problem && onViewProblem(record.problem)}
+        >
+          {t.history.view}
+        </Button>
+      ),
+    },
+  ]
+
+  const dataSource: TableRecord[] = sortedSubmissions.map(submission => ({
+    ...submission,
+    key: submission.id,
+    problem: problems.find(p => p.id === submission.problemId),
+  })).filter(item => item.problem)
+
   return (
     <Card>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t.history.problem}</TableHead>
-            <TableHead>{t.history.status}</TableHead>
-            <TableHead>{t.history.score}</TableHead>
-            <TableHead>{t.history.language}</TableHead>
-            <TableHead>{t.history.submittedAt}</TableHead>
-            <TableHead>{t.history.view}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedSubmissions.map(submission => {
-            const problem = problems.find(p => p.id === submission.problemId)
-            if (!problem) return null
-
-            return (
-              <TableRow key={submission.id}>
-                <TableCell className="font-medium">{problem.title}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(submission.status)}
-                    <Badge className={getStatusColor(submission.status)}>
-                      {getStatusText(submission.status)}
-                    </Badge>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="font-semibold">{submission.score}%</span>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">{submission.language}</Badge>
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {format(new Date(submission.submittedAt), 'MMM d, yyyy HH:mm')}
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onViewProblem(problem)}
-                  >
-                    {t.history.view}
-                  </Button>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+      <Table 
+        columns={columns} 
+        dataSource={dataSource}
+        pagination={{ pageSize: 10 }}
+      />
     </Card>
   )
 }

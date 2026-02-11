@@ -2,12 +2,13 @@
 
 import { useEffect, useRef } from 'react'
 import { Problem, Submission } from '@/lib/api'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Trophy, CheckCircle, Fire, TrendUp } from '@phosphor-icons/react'
+import { Card, Tag, Typography, Row, Col, Statistic } from 'antd'
+import { TrophyOutlined, CheckCircleFilled, FireOutlined, RiseOutlined } from '@ant-design/icons'
 import * as echarts from 'echarts'
 import { motion } from 'framer-motion'
 import { useI18n } from '@/hooks/use-i18n'
+
+const { Text, Title } = Typography
 
 interface DashboardStatsProps {
   problems: Problem[]
@@ -189,93 +190,104 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0, duration: 0.3 }}
-        >
-          <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <div className="flex items-center gap-3 mb-2">
-              <Trophy size={24} weight="fill" className="text-primary" />
-              <span className="text-sm font-medium text-muted-foreground">{t.dashboard.totalProblems}</span>
-            </div>
-            <div className="text-3xl font-bold">{totalSolved}</div>
-            <div className="text-xs text-muted-foreground mt-1">{totalProblems} {t.problems.title}</div>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} md={6}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0, duration: 0.3 }}
+          >
+            <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
+              <Statistic
+                title={<span className="text-indigo-700">{t.dashboard.totalProblems}</span>}
+                value={totalSolved}
+                prefix={<TrophyOutlined style={{ color: '#4f46e5' }} />}
+                suffix={<Text type="secondary">/ {totalProblems}</Text>}
+              />
+            </Card>
+          </motion.div>
+        </Col>
+
+        <Col xs={24} sm={12} md={6}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
+          >
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+              <Statistic
+                title={<span className="text-green-700">{t.dashboard.easy}</span>}
+                value={easySolved}
+                prefix={<CheckCircleFilled style={{ color: '#52c41a' }} />}
+                suffix={<Text type="secondary">/ {easyTotal}</Text>}
+              />
+            </Card>
+          </motion.div>
+        </Col>
+
+        <Col xs={24} sm={12} md={6}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.3 }}
+          >
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+              <Statistic
+                title={<span className="text-orange-700">{t.dashboard.medium}</span>}
+                value={mediumSolved}
+                prefix={<FireOutlined style={{ color: '#faad14' }} />}
+                suffix={<Text type="secondary">/ {mediumTotal}</Text>}
+              />
+            </Card>
+          </motion.div>
+        </Col>
+
+        <Col xs={24} sm={12} md={6}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.3 }}
+          >
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+              <Statistic
+                title={<span className="text-red-700">{t.dashboard.hard}</span>}
+                value={hardSolved}
+                prefix={<RiseOutlined style={{ color: '#ff4d4f' }} />}
+                suffix={<Text type="secondary">/ {hardTotal}</Text>}
+              />
+            </Card>
+          </motion.div>
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12}>
+          <Card>
+            <div ref={chartRef} style={{ width: '100%', height: '300px' }} />
           </Card>
-        </motion.div>
+        </Col>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.3 }}
-        >
-          <Card className="p-6 bg-gradient-to-br from-success/10 to-success/5 border-success/20">
-            <div className="flex items-center gap-3 mb-2">
-              <CheckCircle size={24} weight="fill" className="text-success" />
-              <span className="text-sm font-medium text-muted-foreground">{t.dashboard.easy}</span>
-            </div>
-            <div className="text-3xl font-bold">{easySolved}</div>
-            <div className="text-xs text-muted-foreground mt-1">{easyTotal}</div>
+        <Col xs={24} md={12}>
+          <Card>
+            <div ref={pieChartRef} style={{ width: '100%', height: '300px' }} />
           </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.3 }}
-        >
-          <Card className="p-6 bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20">
-            <div className="flex items-center gap-3 mb-2">
-              <Fire size={24} weight="fill" className="text-warning" />
-              <span className="text-sm font-medium text-muted-foreground">{t.dashboard.medium}</span>
-            </div>
-            <div className="text-3xl font-bold">{mediumSolved}</div>
-            <div className="text-xs text-muted-foreground mt-1">{mediumTotal}</div>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.3 }}
-        >
-          <Card className="p-6 bg-gradient-to-br from-destructive/10 to-destructive/5 border-destructive/20">
-            <div className="flex items-center gap-3 mb-2">
-              <TrendUp size={24} weight="fill" className="text-destructive" />
-              <span className="text-sm font-medium text-muted-foreground">{t.dashboard.hard}</span>
-            </div>
-            <div className="text-3xl font-bold">{hardSolved}</div>
-            <div className="text-xs text-muted-foreground mt-1">{hardTotal}</div>
-          </Card>
-        </motion.div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <div ref={chartRef} style={{ width: '100%', height: '300px' }} />
-        </Card>
-
-        <Card className="p-6">
-          <div ref={pieChartRef} style={{ width: '100%', height: '300px' }} />
-        </Card>
-      </div>
+        </Col>
+      </Row>
 
       {recentlySolved.length > 0 && (
-        <Card className="p-6">
-          <h3 className="font-semibold text-lg mb-4">{t.dashboard.recentActivity}</h3>
+        <Card title={t.dashboard.recentActivity}>
           <div className="space-y-2">
             {recentlySolved.map(problem => (
               <div
                 key={problem.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer"
+                className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
                 onClick={() => onViewProblem(problem)}
               >
                 <div className="flex items-center gap-3">
-                  <CheckCircle size={20} weight="fill" className="text-success" />
-                  <span className="font-medium">{problem.title}</span>
+                  <CheckCircleFilled style={{ color: '#52c41a', fontSize: 20 }} />
+                  <Text strong>{problem.title}</Text>
                 </div>
-                <Badge variant="outline">{problem.difficulty}</Badge>
+                <Tag>{problem.difficulty}</Tag>
               </div>
             ))}
           </div>
@@ -283,12 +295,12 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
       )}
 
       {problems.length > 0 && totalSolved === 0 && (
-        <Card className="p-12 text-center bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20">
-          <Fire size={48} className="mx-auto text-accent mb-4" weight="duotone" />
-          <h3 className="font-semibold text-lg mb-2">{t.dashboard.quickStart}</h3>
-          <p className="text-sm text-muted-foreground mb-4">
+        <Card className="text-center bg-gradient-to-br from-cyan-50 to-cyan-100 border-cyan-200">
+          <FireOutlined style={{ fontSize: 48, color: '#06b6d4' }} />
+          <Title level={4} className="mt-4">{t.dashboard.quickStart}</Title>
+          <Text type="secondary">
             {problems.length} {t.dashboard.startPracticing}
-          </p>
+          </Text>
         </Card>
       )}
     </div>

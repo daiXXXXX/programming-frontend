@@ -1,8 +1,8 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from 'antd'
+import { TranslationOutlined } from '@ant-design/icons'
 import { useI18n } from '@/hooks/use-i18n'
-import { Translate } from '@phosphor-icons/react'
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useI18n()
@@ -13,12 +13,11 @@ export function LanguageSwitcher() {
 
   return (
     <Button
-      variant="outline"
-      size="sm"
+      type="default"
+      size="middle"
       onClick={toggleLanguage}
-      className="gap-2"
+      icon={<TranslationOutlined />}
     >
-      <Translate size={18} />
       {language === 'zh' ? '中文' : 'English'}
     </Button>
   )

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Space_Grotesk, JetBrains_Mono } from 'next/font/google'
-import { Toaster } from 'sonner'
+import { AntdRegistry } from '@ant-design/nextjs-registry'
 import './globals.css'
 import { Providers } from './providers'
 
@@ -27,10 +27,11 @@ export default function RootLayout({
   return (
     <html lang="zh" suppressHydrationWarning>
       <body className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
-        <Providers>
-          {children}
-          <Toaster richColors position="top-right" />
-        </Providers>
+        <AntdRegistry>
+          <Providers>
+            {children}
+          </Providers>
+        </AntdRegistry>
       </body>
     </html>
   )

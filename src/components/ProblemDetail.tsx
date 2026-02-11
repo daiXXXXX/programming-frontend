@@ -2,21 +2,20 @@
 
 import { useState } from 'react'
 import { Problem, Submission } from '@/lib/api'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { Card, Button, Input, Tag, Divider, Typography, Empty } from 'antd'
 import { 
-  ArrowLeft, 
-  Play, 
-  CheckCircle, 
-  XCircle,
-  Clock
-} from '@phosphor-icons/react'
+  ArrowLeftOutlined, 
+  PlayCircleFilled, 
+  CheckCircleFilled, 
+  CloseCircleFilled,
+  ClockCircleOutlined
+} from '@ant-design/icons'
 import { format } from 'date-fns'
 import { motion } from 'framer-motion'
 import { useI18n } from '@/hooks/use-i18n'
+
+const { TextArea } = Input
+const { Title, Text, Paragraph } = Typography
 
 interface ProblemDetailProps {
   problem: Problem
@@ -47,83 +46,82 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
   const getStatusIcon = (status: Submission['status']) => {
     switch (status) {
       case 'Accepted':
-        return <CheckCircle size={16} weight="fill" className="text-success" />
+        return <CheckCircleFilled style={{ color: '#52c41a', fontSize: 16 }} />
       case 'Wrong Answer':
       case 'Runtime Error':
-        return <XCircle size={16} weight="fill" className="text-destructive" />
+        return <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 16 }} />
       default:
-        return <Clock size={16} className="text-muted-foreground" />
+        return <ClockCircleOutlined style={{ color: '#8c8c8c', fontSize: 16 }} />
     }
   }
 
-  const getStatusColor = (status: Submission['status']) => {
+  const getStatusColor = (status: Submission['status']): "success" | "error" | "warning" | "default" => {
     switch (status) {
       case 'Accepted':
-        return 'bg-success/10 text-success border-success/20'
+        return 'success'
       case 'Wrong Answer':
-        return 'bg-destructive/10 text-destructive border-destructive/20'
+        return 'error'
       case 'Runtime Error':
-        return 'bg-warning/10 text-warning border-warning/20'
+        return 'warning'
       default:
-        return 'bg-muted text-muted-foreground'
+        return 'default'
     }
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={onBack} className="gap-2">
-          <ArrowLeft size={18} />
+        <Button icon={<ArrowLeftOutlined />} onClick={onBack}>
           {t.problemDetail.backToList}
         </Button>
-        <h2 className="text-2xl font-bold">{problem.title}</h2>
+        <Title level={3} style={{ margin: 0 }}>{problem.title}</Title>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <Card className="p-6">
-            <h3 className="font-semibold text-lg mb-4">{t.problemDetail.description}</h3>
-            <p className="text-sm leading-relaxed mb-4">{problem.description}</p>
+          <Card>
+            <Title level={5}>{t.problemDetail.description}</Title>
+            <Paragraph className="text-sm leading-relaxed">{problem.description}</Paragraph>
 
-            <Separator className="my-4" />
+            <Divider />
 
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium text-sm mb-2">{t.problemDetail.inputFormat}</h4>
-                <p className="text-sm text-muted-foreground whitespace-pre-line">{problem.inputFormat}</p>
+                <Text strong className="text-sm">{t.problemDetail.inputFormat}</Text>
+                <Paragraph type="secondary" className="text-sm whitespace-pre-line">{problem.inputFormat}</Paragraph>
               </div>
 
               <div>
-                <h4 className="font-medium text-sm mb-2">{t.problemDetail.outputFormat}</h4>
-                <p className="text-sm text-muted-foreground whitespace-pre-line">{problem.outputFormat}</p>
+                <Text strong className="text-sm">{t.problemDetail.outputFormat}</Text>
+                <Paragraph type="secondary" className="text-sm whitespace-pre-line">{problem.outputFormat}</Paragraph>
               </div>
 
               <div>
-                <h4 className="font-medium text-sm mb-2">{t.problemDetail.constraints}</h4>
-                <p className="text-sm text-muted-foreground whitespace-pre-line">{problem.constraints}</p>
+                <Text strong className="text-sm">{t.problemDetail.constraints}</Text>
+                <Paragraph type="secondary" className="text-sm whitespace-pre-line">{problem.constraints}</Paragraph>
               </div>
             </div>
 
-            <Separator className="my-4" />
+            <Divider />
 
             <div>
-              <h4 className="font-medium text-sm mb-3">{t.problemDetail.examples}</h4>
-              <div className="space-y-4">
+              <Text strong className="text-sm">{t.problemDetail.examples}</Text>
+              <div className="space-y-4 mt-3">
                 {problem.examples.map((example, idx) => (
-                  <Card key={idx} className="p-4 bg-muted/30">
+                  <Card key={idx} size="small" style={{ backgroundColor: '#fafafa' }}>
                     <div className="space-y-2">
                       <div>
-                        <div className="text-xs font-medium text-muted-foreground mb-1">{t.problemDetail.input}:</div>
-                        <pre className="text-sm font-mono bg-background p-2 rounded">{example.input}</pre>
+                        <Text type="secondary" className="text-xs">{t.problemDetail.input}:</Text>
+                        <pre className="text-sm font-mono bg-white p-2 rounded mt-1">{example.input}</pre>
                       </div>
                       <div>
-                        <div className="text-xs font-medium text-muted-foreground mb-1">{t.problemDetail.output}:</div>
-                        <pre className="text-sm font-mono bg-background p-2 rounded">{example.output}</pre>
+                        <Text type="secondary" className="text-xs">{t.problemDetail.output}:</Text>
+                        <pre className="text-sm font-mono bg-white p-2 rounded mt-1">{example.output}</pre>
                       </div>
                       {example.explanation && (
                         <div>
-                          <div className="text-xs font-medium text-muted-foreground mb-1">{t.problemDetail.explanation}:</div>
-                          <p className="text-xs text-muted-foreground">{example.explanation}</p>
+                          <Text type="secondary" className="text-xs">{t.problemDetail.explanation}:</Text>
+                          <Paragraph type="secondary" className="text-xs mt-1">{example.explanation}</Paragraph>
                         </div>
                       )}
                     </div>
@@ -133,29 +131,29 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h3 className="font-semibold text-lg mb-4">{t.problemDetail.recentSubmissions}</h3>
+          <Card title={t.problemDetail.recentSubmissions}>
             {recentSubmissions.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">{t.problemDetail.noSubmissions}</p>
+              <Empty description={t.problemDetail.noSubmissions} />
             ) : (
               <div className="space-y-2">
                 {recentSubmissions.map(sub => (
                   <div 
                     key={sub.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       {getStatusIcon(sub.status)}
                       <div>
-                        <div className="text-sm font-medium">{sub.status}</div>
-                        <div className="text-xs text-muted-foreground">
+                        <Text strong className="text-sm">{sub.status}</Text>
+                        <br />
+                        <Text type="secondary" className="text-xs">
                           {format(new Date(sub.submittedAt), 'MMM d, HH:mm')}
-                        </div>
+                        </Text>
                       </div>
                     </div>
-                    <Badge className={getStatusColor(sub.status)}>
+                    <Tag color={getStatusColor(sub.status)}>
                       {sub.score}%
-                    </Badge>
+                    </Tag>
                   </div>
                 ))}
               </div>
@@ -164,22 +162,24 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
         </div>
 
         <div className="space-y-6">
-          <Card className="p-6">
-            <h3 className="font-semibold text-lg mb-4">{t.problemDetail.yourCode}</h3>
-            <Textarea
+          <Card title={t.problemDetail.yourCode}>
+            <TextArea
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder={t.problemDetail.writeCodeHere}
-              className="font-mono text-sm min-h-[400px] resize-y"
+              className="font-mono text-sm"
+              style={{ minHeight: 400, resize: 'vertical' }}
               id="code-editor"
             />
             <Button
+              type="primary"
               onClick={handleSubmit}
               disabled={isSubmitting || !code.trim()}
-              className="w-full mt-4 gap-2"
-              size="lg"
+              block
+              size="large"
+              icon={<PlayCircleFilled />}
+              style={{ marginTop: 16 }}
             >
-              <Play size={20} weight="fill" />
               {isSubmitting ? t.problemDetail.submitting : t.problemDetail.submit}
             </Button>
           </Card>
@@ -190,38 +190,37 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="p-6">
-                <h3 className="font-semibold text-lg mb-4">{t.problemDetail.testResults}</h3>
+              <Card title={t.problemDetail.testResults}>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{t.history.status}</span>
-                    <Badge className={getStatusColor(lastSubmission.status)}>
+                    <Text strong className="text-sm">{t.history.status}</Text>
+                    <Tag color={getStatusColor(lastSubmission.status)}>
                       {lastSubmission.status}
-                    </Badge>
+                    </Tag>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{t.history.score}</span>
-                    <span className="text-lg font-bold">{lastSubmission.score}%</span>
+                    <Text strong className="text-sm">{t.history.score}</Text>
+                    <Text strong className="text-lg">{lastSubmission.score}%</Text>
                   </div>
-                  <Separator />
+                  <Divider />
                   <div>
-                    <div className="text-sm font-medium mb-2">{t.problemDetail.testCase}</div>
-                    <div className="space-y-2">
+                    <Text strong className="text-sm">{t.problemDetail.testCase}</Text>
+                    <div className="space-y-2 mt-2">
                       {lastSubmission.testResults.map((result, idx) => (
                         <div 
                           key={result.testCaseId}
-                          className="flex items-center justify-between p-2 rounded bg-muted/20"
+                          className="flex items-center justify-between p-2 rounded bg-gray-50"
                         >
                           <div className="flex items-center gap-2">
                             {result.passed ? (
-                              <CheckCircle size={16} weight="fill" className="text-success" />
+                              <CheckCircleFilled style={{ color: '#52c41a', fontSize: 16 }} />
                             ) : (
-                              <XCircle size={16} weight="fill" className="text-destructive" />
+                              <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 16 }} />
                             )}
-                            <span className="text-sm">{t.problemDetail.testCase} {idx + 1}</span>
+                            <Text className="text-sm">{t.problemDetail.testCase} {idx + 1}</Text>
                           </div>
                           {result.executionTime !== undefined && (
-                            <span className="text-xs text-muted-foreground">{result.executionTime}ms</span>
+                            <Text type="secondary" className="text-xs">{result.executionTime}ms</Text>
                           )}
                         </div>
                       ))}
