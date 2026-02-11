@@ -1,28 +1,31 @@
 'use client'
 
-import { Tabs, Button, Space, Spin, Typography } from 'antd'
+import { Tabs, Button, Space, Spin, Typography, Dropdown, Avatar } from 'antd'
 import { 
   Code, 
   ChartBar, 
   List,
   Trophy,
 } from '@phosphor-icons/react'
+import { UserOutlined, LogoutOutlined, LoginOutlined } from '@ant-design/icons'
+import Link from 'next/link'
 import { ProblemList } from '@/components/ProblemList'
 import { ProblemDetail } from '@/components/ProblemDetail'
 import { SubmissionHistory } from '@/components/SubmissionHistory'
 import { DashboardStats } from '@/components/DashboardStats'
 import { motion } from 'framer-motion'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import { useI18n, useProblems, useSubmissions, useUIState } from '@/hooks'
+import { useI18n, useProblems, useSubmissions, useUIState, useAuth, getRoleLabel } from '@/hooks'
 import { Submission } from '@/lib/api'
 import styles from './page.module.css'
 
 const { Title, Text } = Typography
 
 export default function HomePage() {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const { problems, loading: problemsLoading } = useProblems()
   const { submissions, loading: submissionsLoading, submitCode, getSolvedProblemIds, getProblemSubmissions } = useSubmissions()
+  const { user, isAuthenticated, logout } = useAuth()
   const { 
     activeTab, 
     filterDifficulty, 
@@ -153,6 +156,44 @@ export default function HomePage() {
                   <Text type="secondary">{t.header.solved}</Text>
                 </div>
                 <LanguageSwitcher />
+                
+                {isAuthenticated && user ? (
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: 'user-info',
+                          label: (
+                            <div className="px-2 py-1">
+                              <div className="font-medium">{user.username}</div>
+                              <div className="text-xs text-gray-500">{getRoleLabel(user.role)}</div>
+                            </div>
+                          ),
+                          disabled: true,
+                        },
+                        { type: 'divider' },
+                        {
+                          key: 'logout',
+                          icon: <LogoutOutlined />,
+                          label: language === 'zh' ? '退出登录' : 'Logout',
+                          onClick: logout,
+                        },
+                      ],
+                    }}
+                    placement="bottomRight"
+                  >
+                    <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-colors">
+                      <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#1677ff' }} />
+                      <span className="text-sm font-medium">{user.username}</span>
+                    </div>
+                  </Dropdown>
+                ) : (
+                  <Link href="/login">
+                    <Button type="primary" icon={<LoginOutlined />}>
+                      {language === 'zh' ? '登录' : 'Login'}
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

@@ -2,8 +2,35 @@
 // 在Next.js中，API请求会通过rewrites代理到后端
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api'
 
-// 默认用户ID（在实现登录功能前使用）
-const DEFAULT_USER_ID = 1
+// 获取存储的访问Token
+function getAccessToken(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const stored = localStorage.getItem('auth-storage')
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      return parsed.state?.accessToken || null
+    }
+  } catch {
+    // ignore
+  }
+  return null
+}
+
+// 获取当前用户ID
+function getCurrentUserId(): number | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const stored = localStorage.getItem('auth-storage')
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      return parsed.state?.user?.id || null
+    }
+  } catch {
+    // ignore
+  }
+  return null
+}
 
 // API 客户端
 class ApiClient {
@@ -15,35 +42,47 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options?: RequestInit
+    options?: RequestInit & { requireAuth?: boolean }
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
+    const { requireAuth = true, ...fetchOptions } = options || {}
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(fetchOptions?.headers as Record<string, string>),
+    }
+
+    // 添加认证头
+    if (requireAuth) {
+      const token = getAccessToken()
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+    }
     
     const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      ...fetchOptions,
+      headers,
     })
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Network error' }))
-      throw new Error(error.error || `HTTP ${response.status}`)
+      throw new Error(error.error || error.message || `HTTP ${response.status}`)
     }
 
     return response.json()
   }
 
-  // 题目相关 API
+  // 题目相关 API（公开）
   async getProblems() {
-    return this.request<Problem[]>('/problems')
+    return this.request<Problem[]>('/problems', { requireAuth: false })
   }
 
   async getProblem(id: string | number) {
-    return this.request<Problem>(`/problems/${id}`)
+    return this.request<Problem>(`/problems/${id}`, { requireAuth: false })
   }
 
+  // 题目管理API（需要教师权限）
   async createProblem(data: CreateProblemRequest) {
     return this.request<Problem>('/problems', {
       method: 'POST',
@@ -64,13 +103,14 @@ class ApiClient {
     })
   }
 
-  // 提交相关 API
+  // 提交相关 API（需要登录）
   async submitCode(data: SubmitCodeRequest) {
+    const userId = getCurrentUserId()
     return this.request<Submission>('/submissions', {
       method: 'POST',
       body: JSON.stringify({
         ...data,
-        userId: DEFAULT_USER_ID,
+        userId: userId || 1,
       }),
     })
   }
@@ -79,17 +119,19 @@ class ApiClient {
     return this.request<Submission>(`/submissions/${id}`)
   }
 
-  async getUserSubmissions(userId: number = DEFAULT_USER_ID, limit = 100, offset = 0) {
-    return this.request<Submission[]>(`/submissions/user/${userId}?limit=${limit}&offset=${offset}`)
+  async getUserSubmissions(userId?: number, limit = 100, offset = 0) {
+    const uid = userId || getCurrentUserId() || 1
+    return this.request<Submission[]>(`/submissions/user/${uid}?limit=${limit}&offset=${offset}`)
   }
 
   async getProblemSubmissions(problemId: string | number, limit = 100, offset = 0) {
     return this.request<Submission[]>(`/submissions/problem/${problemId}?limit=${limit}&offset=${offset}`)
   }
 
-  // 统计相关 API
-  async getUserStats(userId: number = DEFAULT_USER_ID) {
-    return this.request<UserStats>(`/stats/user/${userId}`)
+  // 统计相关 API（需要登录）
+  async getUserStats(userId?: number) {
+    const uid = userId || getCurrentUserId() || 1
+    return this.request<UserStats>(`/stats/user/${uid}`)
   }
 }
 
