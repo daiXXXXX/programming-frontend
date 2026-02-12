@@ -165,6 +165,12 @@ export default function WorkspacePage() {
                   <span className="font-semibold">{solvedProblems.size}</span>
                   <Text type="secondary">{t('header.solved')}</Text>
                 </div>
+                <Link href="/ranking">
+                  <Button type="text" className="flex items-center gap-1.5 text-gray-600 hover:text-indigo-600">
+                    <Trophy size={18} weight="duotone" />
+                    <span>{t('header.ranking')}</span>
+                  </Button>
+                </Link>
                 <LanguageSwitcher />
                 
                 {isAuthenticated && user ? (

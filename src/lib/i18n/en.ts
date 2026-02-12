@@ -24,6 +24,13 @@ const en: Record<string, string> = {
   'header.title': 'OJ Platform',
   'header.subtitle': 'Online Judge Practice System',
   'header.solved': 'Solved',
+  'header.ranking': 'Ranking',
+
+  // Ranking
+  'ranking.title': 'Leaderboard',
+  'ranking.totalTab': 'All Time',
+  'ranking.todayTab': 'Today',
+  'ranking.noData': 'No ranking data',
 
   // Tabs
   'tabs.dashboard': 'Dashboard',
@@ -119,6 +126,7 @@ const en: Record<string, string> = {
   'common.confirm': 'Confirm',
   'common.login': 'Login',
   'common.logout': 'Logout',
+  'common.back': 'Back',
 }
 
 export default en

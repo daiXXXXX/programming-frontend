@@ -24,6 +24,13 @@ const zh: Record<string, string> = {
   'header.title': '在线判题平台',
   'header.subtitle': '程序设计实验辅助教学平台',
   'header.solved': '已解决',
+  'header.ranking': '排行榜',
+
+  // 排行榜
+  'ranking.title': '刷题排行榜',
+  'ranking.totalTab': '总榜',
+  'ranking.todayTab': '今日榜',
+  'ranking.noData': '暂无排行数据',
 
   // 标签页
   'tabs.dashboard': '仪表板',
@@ -119,6 +126,7 @@ const zh: Record<string, string> = {
   'common.confirm': '确认',
   'common.login': '登录',
   'common.logout': '退出登录',
+  'common.back': '返回',
 }
 
 export default zh
