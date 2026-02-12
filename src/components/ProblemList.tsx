@@ -30,8 +30,8 @@ export function ProblemList({ problems, solvedProblems, onSelectProblem }: Probl
           image={<FireOutlined style={{ fontSize: 48, color: '#999' }} />}
           description={
             <div>
-              <Title level={5}>{t.problems.noProblems}</Title>
-              <Text type="secondary">{t.dashboard.noActivity}</Text>
+              <Title level={5}>{t('problems.noProblems')}</Title>
+              <Text type="secondary">{t('dashboard.noActivity')}</Text>
             </div>
           }
         />

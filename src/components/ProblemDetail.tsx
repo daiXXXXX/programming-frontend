@@ -72,7 +72,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button icon={<ArrowLeftOutlined />} onClick={onBack}>
-          {t.problemDetail.backToList}
+          {t('problemDetail.backToList')}
         </Button>
         <Title level={3} style={{ margin: 0 }}>{problem.title}</Title>
       </div>
@@ -80,24 +80,24 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
           <Card>
-            <Title level={5}>{t.problemDetail.description}</Title>
+            <Title level={5}>{t('problemDetail.description')}</Title>
             <Paragraph className="text-sm leading-relaxed">{problem.description}</Paragraph>
 
             <Divider />
 
             <div className="space-y-4">
               <div>
-                <Text strong className="text-sm">{t.problemDetail.inputFormat}</Text>
+                <Text strong className="text-sm">{t('problemDetail.inputFormat')}</Text>
                 <Paragraph type="secondary" className="text-sm whitespace-pre-line">{problem.inputFormat}</Paragraph>
               </div>
 
               <div>
-                <Text strong className="text-sm">{t.problemDetail.outputFormat}</Text>
+                <Text strong className="text-sm">{t('problemDetail.outputFormat')}</Text>
                 <Paragraph type="secondary" className="text-sm whitespace-pre-line">{problem.outputFormat}</Paragraph>
               </div>
 
               <div>
-                <Text strong className="text-sm">{t.problemDetail.constraints}</Text>
+                <Text strong className="text-sm">{t('problemDetail.constraints')}</Text>
                 <Paragraph type="secondary" className="text-sm whitespace-pre-line">{problem.constraints}</Paragraph>
               </div>
             </div>
@@ -105,22 +105,22 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
             <Divider />
 
             <div>
-              <Text strong className="text-sm">{t.problemDetail.examples}</Text>
+              <Text strong className="text-sm">{t('problemDetail.examples')}</Text>
               <div className="space-y-4 mt-3">
                 {problem.examples.map((example, idx) => (
                   <Card key={idx} size="small" style={{ backgroundColor: '#fafafa' }}>
                     <div className="space-y-2">
                       <div>
-                        <Text type="secondary" className="text-xs">{t.problemDetail.input}:</Text>
+                        <Text type="secondary" className="text-xs">{t('problemDetail.input')}:</Text>
                         <pre className="text-sm font-mono bg-white p-2 rounded mt-1">{example.input}</pre>
                       </div>
                       <div>
-                        <Text type="secondary" className="text-xs">{t.problemDetail.output}:</Text>
+                        <Text type="secondary" className="text-xs">{t('problemDetail.output')}:</Text>
                         <pre className="text-sm font-mono bg-white p-2 rounded mt-1">{example.output}</pre>
                       </div>
                       {example.explanation && (
                         <div>
-                          <Text type="secondary" className="text-xs">{t.problemDetail.explanation}:</Text>
+                          <Text type="secondary" className="text-xs">{t('problemDetail.explanation')}:</Text>
                           <Paragraph type="secondary" className="text-xs mt-1">{example.explanation}</Paragraph>
                         </div>
                       )}
@@ -131,9 +131,9 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
             </div>
           </Card>
 
-          <Card title={t.problemDetail.recentSubmissions}>
+          <Card title={t('problemDetail.recentSubmissions')}>
             {recentSubmissions.length === 0 ? (
-              <Empty description={t.problemDetail.noSubmissions} />
+              <Empty description={t('problemDetail.noSubmissions')} />
             ) : (
               <div className="space-y-2">
                 {recentSubmissions.map(sub => (
@@ -162,11 +162,11 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
         </div>
 
         <div className="space-y-6">
-          <Card title={t.problemDetail.yourCode}>
+          <Card title={t('problemDetail.yourCode')}>
             <TextArea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder={t.problemDetail.writeCodeHere}
+              placeholder={t('problemDetail.writeCodeHere')}
               className="font-mono text-sm"
               style={{ minHeight: 400, resize: 'vertical' }}
               id="code-editor"
@@ -180,7 +180,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
               icon={<PlayCircleFilled />}
               style={{ marginTop: 16 }}
             >
-              {isSubmitting ? t.problemDetail.submitting : t.problemDetail.submit}
+              {isSubmitting ? t('problemDetail.submitting') : t('problemDetail.submit')}
             </Button>
           </Card>
 
@@ -190,23 +190,23 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <Card title={t.problemDetail.testResults}>
+              <Card title={t('problemDetail.testResults')}>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Text strong className="text-sm">{t.history.status}</Text>
+                    <Text strong className="text-sm">{t('history.status')}</Text>
                     <Tag color={getStatusColor(lastSubmission.status)}>
                       {lastSubmission.status}
                     </Tag>
                   </div>
                   <div className="flex items-center justify-between">
-                    <Text strong className="text-sm">{t.history.score}</Text>
+                    <Text strong className="text-sm">{t('history.score')}</Text>
                     <Text strong className="text-lg">{lastSubmission.score}%</Text>
                   </div>
                   <Divider />
                   <div>
-                    <Text strong className="text-sm">{t.problemDetail.testCase}</Text>
+                    <Text strong className="text-sm">{t('problemDetail.testCase')}</Text>
                     <div className="space-y-2 mt-2">
-                      {lastSubmission.testResults.map((result, idx) => (
+                      {lastSubmission.testResults?.map((result, idx) => (
                         <div 
                           key={result.testCaseId}
                           className="flex items-center justify-between p-2 rounded bg-gray-50"
@@ -217,7 +217,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
                             ) : (
                               <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 16 }} />
                             )}
-                            <Text className="text-sm">{t.problemDetail.testCase} {idx + 1}</Text>
+                            <Text className="text-sm">{t('problemDetail.testCase')} {idx + 1}</Text>
                           </div>
                           {result.executionTime !== undefined && (
                             <Text type="secondary" className="text-xs">{result.executionTime}ms</Text>

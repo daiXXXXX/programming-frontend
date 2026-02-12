@@ -60,7 +60,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
 
     const option = {
       title: {
-        text: t.dashboard.recentActivity,
+        text: t('dashboard.recentActivity'),
         textStyle: {
           fontSize: 16,
           fontWeight: 600,
@@ -119,7 +119,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
     
     const option = {
       title: {
-        text: t.dashboard.difficultyBreakdown,
+        text: t('dashboard.difficultyBreakdown'),
         textStyle: {
           fontSize: 16,
           fontWeight: 600,
@@ -155,9 +155,9 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           }
         },
         data: [
-          { value: easySolved, name: t.dashboard.easy, itemStyle: { color: '#52C41A' } },
-          { value: mediumSolved, name: t.dashboard.medium, itemStyle: { color: '#FAAD14' } },
-          { value: hardSolved, name: t.dashboard.hard, itemStyle: { color: '#FF4D4F' } }
+          { value: easySolved, name: t('dashboard.easy'), itemStyle: { color: '#52C41A' } },
+          { value: mediumSolved, name: t('dashboard.medium'), itemStyle: { color: '#FAAD14' } },
+          { value: hardSolved, name: t('dashboard.hard'), itemStyle: { color: '#FF4D4F' } }
         ].filter(item => item.value > 0)
       }]
     }
@@ -199,7 +199,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           >
             <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
               <Statistic
-                title={<span className="text-indigo-700">{t.dashboard.totalProblems}</span>}
+                title={<span className="text-indigo-700">{t('dashboard.totalProblems')}</span>}
                 value={totalSolved}
                 prefix={<TrophyOutlined style={{ color: '#4f46e5' }} />}
                 suffix={<Text type="secondary">/ {totalProblems}</Text>}
@@ -216,7 +216,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           >
             <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
               <Statistic
-                title={<span className="text-green-700">{t.dashboard.easy}</span>}
+                title={<span className="text-green-700">{t('dashboard.easy')}</span>}
                 value={easySolved}
                 prefix={<CheckCircleFilled style={{ color: '#52c41a' }} />}
                 suffix={<Text type="secondary">/ {easyTotal}</Text>}
@@ -233,7 +233,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           >
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
               <Statistic
-                title={<span className="text-orange-700">{t.dashboard.medium}</span>}
+                title={<span className="text-orange-700">{t('dashboard.medium')}</span>}
                 value={mediumSolved}
                 prefix={<FireOutlined style={{ color: '#faad14' }} />}
                 suffix={<Text type="secondary">/ {mediumTotal}</Text>}
@@ -250,7 +250,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
           >
             <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
               <Statistic
-                title={<span className="text-red-700">{t.dashboard.hard}</span>}
+                title={<span className="text-red-700">{t('dashboard.hard')}</span>}
                 value={hardSolved}
                 prefix={<RiseOutlined style={{ color: '#ff4d4f' }} />}
                 suffix={<Text type="secondary">/ {hardTotal}</Text>}
@@ -275,7 +275,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
       </Row>
 
       {recentlySolved.length > 0 && (
-        <Card title={t.dashboard.recentActivity}>
+        <Card title={t('dashboard.recentActivity')}>
           <div className="space-y-2">
             {recentlySolved.map(problem => (
               <div
@@ -297,9 +297,9 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
       {problems.length > 0 && totalSolved === 0 && (
         <Card className="text-center bg-gradient-to-br from-cyan-50 to-cyan-100 border-cyan-200">
           <FireOutlined style={{ fontSize: 48, color: '#06b6d4' }} />
-          <Title level={4} className="mt-4">{t.dashboard.quickStart}</Title>
+          <Title level={4} className="mt-4">{t('dashboard.quickStart')}</Title>
           <Text type="secondary">
-            {problems.length} {t.dashboard.startPracticing}
+            {problems.length} {t('dashboard.startPracticing')}
           </Text>
         </Card>
       )}

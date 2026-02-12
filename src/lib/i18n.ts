@@ -1,6 +1,38 @@
 export type Language = 'zh' | 'en'
 
 export interface Translations {
+  home: {
+    greeting: {
+      morning: string
+      forenoon: string
+      afternoon: string
+      evening: string
+    }
+    welcome: string
+    subtitle: string
+    startCoding: string
+    viewProblems: string
+    features: {
+      practice: {
+        title: string
+        description: string
+      }
+      realtime: {
+        title: string
+        description: string
+      }
+      progress: {
+        title: string
+        description: string
+      }
+    }
+    stats: {
+      problems: string
+      submissions: string
+      users: string
+    }
+    guest: string
+  }
   header: {
     title: string
     subtitle: string
@@ -103,6 +135,38 @@ export interface Translations {
 
 export const translations: Record<Language, Translations> = {
   zh: {
+    home: {
+      greeting: {
+        morning: '早上好',
+        forenoon: '上午好',
+        afternoon: '下午好',
+        evening: '晚上好'
+      },
+      welcome: '欢迎使用编程实验平台',
+      subtitle: '在线编程练习、实时评测、高效学习',
+      startCoding: '开始编程',
+      viewProblems: '浏览题库',
+      features: {
+        practice: {
+          title: '在线编程',
+          description: '支持多种编程语言，在线编写和运行代码'
+        },
+        realtime: {
+          title: '实时评测',
+          description: '即时反馈测试结果，快速定位问题'
+        },
+        progress: {
+          title: '进度追踪',
+          description: '记录学习历程，可视化展示学习进度'
+        }
+      },
+      stats: {
+        problems: '题目数量',
+        submissions: '提交次数',
+        users: '活跃用户'
+      },
+      guest: '同学'
+    },
     header: {
       title: '在线判题平台',
       subtitle: '程序设计实验辅助教学平台',
@@ -203,6 +267,38 @@ export const translations: Record<Language, Translations> = {
     }
   },
   en: {
+    home: {
+      greeting: {
+        morning: 'Good morning',
+        forenoon: 'Good morning',
+        afternoon: 'Good afternoon',
+        evening: 'Good evening'
+      },
+      welcome: 'Welcome to Programming Lab',
+      subtitle: 'Online coding practice, real-time evaluation, efficient learning',
+      startCoding: 'Start Coding',
+      viewProblems: 'View Problems',
+      features: {
+        practice: {
+          title: 'Online Coding',
+          description: 'Support multiple programming languages, write and run code online'
+        },
+        realtime: {
+          title: 'Real-time Evaluation',
+          description: 'Instant feedback on test results, quickly locate issues'
+        },
+        progress: {
+          title: 'Progress Tracking',
+          description: 'Record learning journey, visualize learning progress'
+        }
+      },
+      stats: {
+        problems: 'Problems',
+        submissions: 'Submissions',
+        users: 'Active Users'
+      },
+      guest: 'Guest'
+    },
     header: {
       title: 'OJ Platform',
       subtitle: 'Online Judge Practice System',

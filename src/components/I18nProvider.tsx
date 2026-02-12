@@ -1,8 +1,8 @@
 'use client'
 
-import { ReactNode, useState, useEffect } from 'react'
+import { ReactNode, useState, useEffect, useCallback } from 'react'
 import { I18nContext } from '@/hooks/use-i18n'
-import { Language, getTranslation } from '@/lib/i18n'
+import { Language, createT } from '@/lib/i18n/index'
 
 interface I18nProviderProps {
   children: ReactNode
@@ -26,12 +26,12 @@ export function I18nProvider({ children }: I18nProviderProps) {
     localStorage.setItem('app-language', lang)
   }
 
-  const t = getTranslation(language)
+  const t = useCallback((key: string) => createT(language)(key), [language])
 
   // 防止SSR水合不匹配
   if (!mounted) {
     return (
-      <I18nContext.Provider value={{ language: 'zh', setLanguage, t: getTranslation('zh') }}>
+      <I18nContext.Provider value={{ language: 'zh', setLanguage, t: createT('zh') }}>
         {children}
       </I18nContext.Provider>
     )
