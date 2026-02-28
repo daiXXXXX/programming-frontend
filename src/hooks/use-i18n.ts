@@ -1,10 +1,10 @@
 import { createContext, useContext } from 'react'
-import { Language, Translations } from '@/lib/i18n'
+import { Language } from '@/lib/i18n'
 
 interface I18nContextType {
   language: Language
   setLanguage: (lang: Language) => void
-  t: Translations
+  t: (key: string) => string
 }
 
 export const I18nContext = createContext<I18nContextType | undefined>(undefined)
@@ -16,3 +16,6 @@ export function useI18n() {
   }
   return context
 }
+
+// 兼容老代码的别名
+export const useTranslation = useI18n

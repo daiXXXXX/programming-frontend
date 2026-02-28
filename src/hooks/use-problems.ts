@@ -36,7 +36,7 @@ export function useProblems() {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '加载题目失败'
       setProblemsError(errorMessage)
-      message.error((t.messages as Record<string, string>)?.loadFailed || errorMessage)
+      message.error(errorMessage)
       return []
     } finally {
       setProblemsLoading(false)

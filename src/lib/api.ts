@@ -133,6 +133,15 @@ class ApiClient {
     const uid = userId || getCurrentUserId() || 1
     return this.request<UserStats>(`/stats/user/${uid}`)
   }
+
+  // 排行榜相关 API（公开）
+  async getTotalSolvedRanking(limit: number = 50) {
+    return this.request<RankingUser[]>(`/ranking/total?limit=${limit}`, { requireAuth: false })
+  }
+
+  async getTodaySolvedRanking(limit: number = 50) {
+    return this.request<RankingUser[]>(`/ranking/today?limit=${limit}`, { requireAuth: false })
+  }
 }
 
 // 导出 API 客户端实例
@@ -226,4 +235,13 @@ export interface SubmitCodeRequest {
   problemId: number
   code: string
   language?: string
+}
+
+export interface RankingUser {
+  userId: number
+  username: string
+  avatar: string
+  totalSolved: number
+  todaySolved: number
+  rank: number
 }

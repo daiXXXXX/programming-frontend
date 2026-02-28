@@ -1,0 +1,42 @@
+/*!******************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./src/app/ranking/ranking.module.css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************/
+.ranking_container__QrbX4 {
+  min-height: 100vh;
+}
+
+.ranking_rankingCard__sEPdf {
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ranking_rankingList__JRtdQ {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+}
+
+.ranking_rankingItem__5qX3f {
+  padding: 12px 16px;
+  background: #fafafa;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.ranking_rankingItem__5qX3f:hover {
+  background: #f0f0f0;
+  transform: translateX(4px);
+}
+
+.ranking_topThree__8WA5_ {
+  background: linear-gradient(135deg, #fff7e6 0%, #fff1cc 100%);
+  border: 1px solid #ffd666;
+}
+
+.ranking_topThree__8WA5_:hover {
+  background: linear-gradient(135deg, #fff1cc 0%, #ffe7a3 100%);
+}
+

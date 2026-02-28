@@ -56,3 +56,12 @@ export interface UserStats {
   acceptedSubmissions: number
   successRate: number
 }
+
+export interface RankingUser {
+  userId: number
+  username: string
+  avatar: string
+  totalSolved: number
+  todaySolved: number
+  rank: number
+}

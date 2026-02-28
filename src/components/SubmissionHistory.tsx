@@ -25,8 +25,8 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
           image={<CodeOutlined style={{ fontSize: 48, color: '#999' }} />}
           description={
             <div>
-              <Title level={5}>{t.history.noSubmissions}</Title>
-              <Text type="secondary">{t.dashboard.noActivity}</Text>
+              <Title level={5}>{t('history.noSubmissions')}</Title>
+              <Text type="secondary">{t('dashboard.noActivity')}</Text>
             </div>
           }
         />
@@ -63,13 +63,13 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
   const getStatusText = (status: Submission['status']) => {
     switch (status) {
       case 'Accepted':
-        return t.status.accepted
+        return t('status.accepted')
       case 'Wrong Answer':
-        return t.status.wrongAnswer
+        return t('status.wrongAnswer')
       case 'Runtime Error':
-        return t.status.runtimeError
+        return t('status.runtimeError')
       default:
-        return t.status.pending
+        return t('status.pending')
     }
   }
 
@@ -79,13 +79,13 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
 
   const columns: ColumnsType<TableRecord> = [
     {
-      title: t.history.problem,
+      title: t('history.problem'),
       dataIndex: 'problemId',
       key: 'problem',
       render: (_, record) => <Text strong>{record.problem?.title || '-'}</Text>,
     },
     {
-      title: t.history.status,
+      title: t('history.status'),
       dataIndex: 'status',
       key: 'status',
       render: (status: Submission['status']) => (
@@ -96,19 +96,19 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
       ),
     },
     {
-      title: t.history.score,
+      title: t('history.score'),
       dataIndex: 'score',
       key: 'score',
       render: (score: number) => <Text strong>{score}%</Text>,
     },
     {
-      title: t.history.language,
+      title: t('history.language'),
       dataIndex: 'language',
       key: 'language',
       render: (language: string) => <Tag>{language}</Tag>,
     },
     {
-      title: t.history.submittedAt,
+      title: t('history.submittedAt'),
       dataIndex: 'submittedAt',
       key: 'submittedAt',
       render: (submittedAt: string) => (
@@ -116,7 +116,7 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
       ),
     },
     {
-      title: t.history.view,
+      title: t('history.view'),
       key: 'action',
       render: (_, record) => (
         <Button 
@@ -124,7 +124,7 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
           size="small"
           onClick={() => record.problem && onViewProblem(record.problem)}
         >
-          {t.history.view}
+          {t('history.view')}
         </Button>
       ),
     },

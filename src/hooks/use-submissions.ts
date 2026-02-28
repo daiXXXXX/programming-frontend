@@ -47,7 +47,7 @@ export function useSubmissions() {
   // 提交代码
   const submitCode = useCallback(async (data: SubmitCodeRequest): Promise<Submission | null> => {
     if (!data.code?.trim()) {
-      message.error(t.messages.writeCodeFirst)
+      message.error(t('messages.writeCodeFirst'))
       return null
     }
 
@@ -63,19 +63,19 @@ export function useSubmissions() {
 
       // 显示结果
       if (submission.status === 'Accepted') {
-        message.success(`✓ ${t.messages.allTestsPassed} ${t.history.score}: ${submission.score}%`)
+        message.success(`✓ ${t('messages.allTestsPassed')} ${t('history.score')}: ${submission.score}%`)
       } else if (submission.status === 'Runtime Error') {
-        message.error(`✗ ${t.messages.runtimeError}`)
+        message.error(`✗ ${t('messages.runtimeError')}`)
       } else {
         const passedCount = submission.testResults?.filter(r => r.passed).length || 0
         const totalCount = submission.testResults?.length || 0
-        message.error(`✗ ${t.messages.wrongAnswer} ${passedCount}/${totalCount} ${t.messages.testsPassed}`)
+        message.error(`✗ ${t('messages.wrongAnswer')} ${passedCount}/${totalCount} ${t('messages.testsPassed')}`)
       }
 
       return submission
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '提交失败'
-      message.error((t.messages as Record<string, string>)?.submitFailed || errorMessage)
+      message.error(errorMessage)
       return null
     } finally {
       setSubmissionsLoading(false)
