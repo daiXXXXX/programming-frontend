@@ -39,7 +39,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
     setTimeout(() => setIsSubmitting(false), 1000)
   }
 
-  const recentSubmissions = submissions
+  const recentSubmissions = (submissions || [])
     .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
     .slice(0, 5)
 
@@ -107,7 +107,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
             <div>
               <Text strong className="text-sm">{t('problemDetail.examples')}</Text>
               <div className="space-y-4 mt-3">
-                {problem.examples.map((example, idx) => (
+                {(problem.examples || []).map((example, idx) => (
                   <Card key={idx} size="small" style={{ backgroundColor: '#fafafa' }}>
                     <div className="space-y-2">
                       <div>
@@ -171,6 +171,12 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
               style={{ minHeight: 400, resize: 'vertical' }}
               id="code-editor"
             />
+            <div style={{ marginTop: 8, marginBottom: 8 }}>
+              <Text type="secondary" className="text-xs">
+                {t('problemDetail.supportedLanguages')}：
+              </Text>
+              <Tag color="gold" style={{ marginLeft: 4 }}>JavaScript</Tag>
+            </div>
             <Button
               type="primary"
               onClick={handleSubmit}

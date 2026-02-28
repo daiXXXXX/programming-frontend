@@ -65,6 +65,7 @@ const zh: Record<string, string> = {
   'problems.tags': '标签',
   'problems.viewProblem': '查看题目',
   'problems.noProblems': '暂无题目',
+  'problems.searchPlaceholder': '搜索题目名称...',
 
   // 题目详情
   'problemDetail.backToList': '返回列表',
@@ -88,6 +89,7 @@ const zh: Record<string, string> = {
   'problemDetail.yourOutput': '你的输出',
   'problemDetail.executionTime': '执行时间',
   'problemDetail.writeCodeHere': '在这里编写你的代码...',
+  'problemDetail.supportedLanguages': '当前支持的语言',
   'problemDetail.recentSubmissions': '最近提交',
   'problemDetail.noSubmissions': '暂无提交记录',
   'problemDetail.viewCode': '查看代码',

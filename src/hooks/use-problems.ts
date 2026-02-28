@@ -20,17 +20,17 @@ export function useProblems() {
     isCacheValid
   } = useAppStore()
 
-  // 加载题目列表
-  const loadProblems = useCallback(async (forceRefresh = false) => {
-    // 如果缓存有效且不强制刷新，直接返回
-    if (!forceRefresh && isCacheValid(problemsLastFetch) && problems.length > 0) {
+  // 加载题目列表（支持搜索）
+  const loadProblems = useCallback(async (forceRefresh = false, searchName?: string) => {
+    // 有搜索关键词时始终请求后端
+    if (!searchName && !forceRefresh && isCacheValid(problemsLastFetch) && problems.length > 0) {
       return problems
     }
 
     try {
       setProblemsLoading(true)
       setProblemsError(null)
-      const data = await api.getProblems()
+      const data = await api.getProblems(searchName)
       setProblems(data || [])
       return data || []
     } catch (error) {
@@ -42,6 +42,11 @@ export function useProblems() {
       setProblemsLoading(false)
     }
   }, [problems, problemsLastFetch, setProblems, setProblemsLoading, setProblemsError, isCacheValid, t])
+
+  // 搜索题目
+  const searchProblems = useCallback(async (name: string) => {
+    return loadProblems(true, name || undefined)
+  }, [loadProblems])
 
   // 获取单个题目
   const getProblem = useCallback((id: number): Problem | undefined => {
@@ -61,6 +66,7 @@ export function useProblems() {
     error: problemsError,
     loadProblems,
     getProblem,
+    searchProblems,
     refresh: () => loadProblems(true)
   }
 }

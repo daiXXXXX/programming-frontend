@@ -74,8 +74,9 @@ class ApiClient {
   }
 
   // 题目相关 API（公开）
-  async getProblems() {
-    return this.request<Problem[]>('/problems', { requireAuth: false })
+  async getProblems(name?: string) {
+    const query = name ? `?name=${encodeURIComponent(name)}` : ''
+    return this.request<Problem[]>(`/problems${query}`, { requireAuth: false })
   }
 
   async getProblem(id: string | number) {

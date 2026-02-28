@@ -1,6 +1,7 @@
 'use client'
 
-import { Tabs, Button, Space, Spin, Typography, Dropdown, Avatar } from 'antd'
+import { Tabs, Button, Space, Spin, Typography, Dropdown, Avatar, Input } from 'antd'
+import { useState, useCallback } from 'react'
 import { 
   Code, 
   ChartBar, 
@@ -23,7 +24,8 @@ const { Title, Text } = Typography
 
 export default function WorkspacePage() {
   const { t } = useI18n()
-  const { problems, loading: problemsLoading } = useProblems()
+  const { problems, loading: problemsLoading, searchProblems, refresh: refreshProblems } = useProblems()
+  const [searchKeyword, setSearchKeyword] = useState('')
   const { submissions, loading: submissionsLoading, submitCode, getSolvedProblemIds, getProblemSubmissions } = useSubmissions()
   const { user, isAuthenticated, logout } = useAuth()
   const { 
@@ -95,7 +97,24 @@ export default function WorkspacePage() {
       children: !selectedProblem ? (
         <>
           <div className="flex items-center justify-between mb-6">
-            <Title level={3} style={{ margin: 0 }}>{t('problems.title')}</Title>
+            <Space>
+              <Title level={3} style={{ margin: 0 }}>{t('problems.title')}</Title>
+              <Input.Search
+                placeholder={t('problems.searchPlaceholder')}
+                allowClear
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                onSearch={(value) => {
+                  if (value.trim()) {
+                    searchProblems(value.trim())
+                  } else {
+                    refreshProblems()
+                  }
+                }}
+                onClear={() => refreshProblems()}
+                style={{ width: 240 }}
+              />
+            </Space>
             <Space>
               {(['All', 'Easy', 'Medium', 'Hard'] as const).map(level => (
                 <Button

@@ -65,6 +65,7 @@ const en: Record<string, string> = {
   'problems.tags': 'Tags',
   'problems.viewProblem': 'View Problem',
   'problems.noProblems': 'No problems available',
+  'problems.searchPlaceholder': 'Search problems...',
 
   // Problem Detail
   'problemDetail.backToList': 'Back to List',
@@ -88,6 +89,7 @@ const en: Record<string, string> = {
   'problemDetail.yourOutput': 'Your Output',
   'problemDetail.executionTime': 'Execution Time',
   'problemDetail.writeCodeHere': 'Write your code here...',
+  'problemDetail.supportedLanguages': 'Supported languages',
   'problemDetail.recentSubmissions': 'Recent Submissions',
   'problemDetail.noSubmissions': 'No submissions yet',
   'problemDetail.viewCode': 'View Code',
