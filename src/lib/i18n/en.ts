@@ -130,6 +130,30 @@ const en: Record<string, string> = {
   'common.login': 'Login',
   'common.logout': 'Logout',
   'common.back': 'Back',
+
+  // Profile
+  'profile.title': 'Profile',
+  'profile.subtitle': 'Manage your account information and preferences',
+  'profile.selectAvatar': 'Choose an avatar',
+  'profile.avatarUrlPlaceholder': 'Or enter a custom avatar URL...',
+  'profile.joinDate': 'Joined',
+  'profile.username': 'Username',
+  'profile.usernamePlaceholder': 'Enter username',
+  'profile.usernameRequired': 'Username is required',
+  'profile.usernameMin': 'Username must be at least 3 characters',
+  'profile.usernameMax': 'Username must be at most 50 characters',
+  'profile.usernamePattern': 'Username can only contain letters, numbers, and underscores',
+  'profile.email': 'Email',
+  'profile.emailPlaceholder': 'Enter email',
+  'profile.emailRequired': 'Email is required',
+  'profile.emailInvalid': 'Please enter a valid email address',
+  'profile.bio': 'Bio',
+  'profile.bioPlaceholder': 'Tell us about yourself...',
+  'profile.bioMax': 'Bio must be at most 500 characters',
+  'profile.save': 'Save',
+  'profile.role.student': 'Student',
+  'profile.role.instructor': 'Instructor',
+  'profile.role.admin': 'Admin',
 }
 
 export default en

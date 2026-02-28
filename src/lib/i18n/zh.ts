@@ -130,6 +130,30 @@ const zh: Record<string, string> = {
   'common.login': '登录',
   'common.logout': '退出登录',
   'common.back': '返回',
+
+  // 个人信息
+  'profile.title': '个人信息',
+  'profile.subtitle': '管理你的账户信息和偏好设置',
+  'profile.selectAvatar': '选择一个头像',
+  'profile.avatarUrlPlaceholder': '或者输入自定义头像 URL...',
+  'profile.joinDate': '加入时间',
+  'profile.username': '用户名',
+  'profile.usernamePlaceholder': '请输入用户名',
+  'profile.usernameRequired': '请输入用户名',
+  'profile.usernameMin': '用户名至少3个字符',
+  'profile.usernameMax': '用户名最多50个字符',
+  'profile.usernamePattern': '用户名只能包含字母、数字和下划线',
+  'profile.email': '邮箱',
+  'profile.emailPlaceholder': '请输入邮箱',
+  'profile.emailRequired': '请输入邮箱',
+  'profile.emailInvalid': '请输入有效的邮箱地址',
+  'profile.bio': '个人简介',
+  'profile.bioPlaceholder': '介绍一下你自己...',
+  'profile.bioMax': '个人简介最多500个字符',
+  'profile.save': '保存',
+  'profile.role.student': '学生',
+  'profile.role.instructor': '教师',
+  'profile.role.admin': '管理员',
 }
 
 export default zh

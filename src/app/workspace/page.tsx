@@ -8,12 +8,13 @@ import {
   List,
   Trophy,
 } from '@phosphor-icons/react'
-import { UserOutlined, LogoutOutlined, LoginOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, LoginOutlined, EditOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { ProblemList } from '@/components/ProblemList'
 import { ProblemDetail } from '@/components/ProblemDetail'
 import { SubmissionHistory } from '@/components/SubmissionHistory'
 import { DashboardStats } from '@/components/DashboardStats'
+import { ProfileModal } from '@/components/ProfileModal'
 import { motion } from 'framer-motion'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useI18n, useProblems, useSubmissions, useUIState, useAuth, getRoleLabel } from '@/hooks'
@@ -27,7 +28,8 @@ export default function WorkspacePage() {
   const { problems, loading: problemsLoading, searchProblems, refresh: refreshProblems } = useProblems()
   const [searchKeyword, setSearchKeyword] = useState('')
   const { submissions, loading: submissionsLoading, submitCode, getSolvedProblemIds, getProblemSubmissions } = useSubmissions()
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout, updateProfile, uploadAvatar, isLoading } = useAuth()
+  const [profileModalOpen, setProfileModalOpen] = useState(false)
   const { 
     activeTab, 
     filterDifficulty, 
@@ -193,6 +195,7 @@ export default function WorkspacePage() {
                 <LanguageSwitcher />
                 
                 {isAuthenticated && user ? (
+                  <>
                   <Dropdown
                     menu={{
                       items: [
@@ -208,6 +211,12 @@ export default function WorkspacePage() {
                         },
                         { type: 'divider' },
                         {
+                          key: 'profile',
+                          icon: <EditOutlined />,
+                          label: t('profile.title'),
+                          onClick: () => setProfileModalOpen(true),
+                        },
+                        {
                           key: 'logout',
                           icon: <LogoutOutlined />,
                           label: t('common.logout'),
@@ -218,10 +227,24 @@ export default function WorkspacePage() {
                     placement="bottomRight"
                   >
                     <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-colors">
-                      <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#1677ff' }} />
+                      <Avatar
+                        size="small"
+                        src={user.avatar || `https://api.dicebear.com/9.x/adventurer/svg?seed=${user.username}`}
+                        icon={<UserOutlined />}
+                        style={{ backgroundColor: '#1677ff' }}
+                      />
                       <span className="text-sm font-medium">{user.username}</span>
                     </div>
                   </Dropdown>
+                  <ProfileModal
+                    open={profileModalOpen}
+                    onClose={() => setProfileModalOpen(false)}
+                    user={user}
+                    onUpdateProfile={updateProfile}
+                    onUploadAvatar={uploadAvatar}
+                    isLoading={isLoading}
+                  />
+                  </>
                 ) : (
                   <Link href="/login">
                     <Button type="primary" icon={<LoginOutlined />}>

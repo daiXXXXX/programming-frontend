@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { message } from 'antd'
 import { useAuthStore, User, UserRole } from '@/store/authStore'
-import { authApi, AuthError, LoginRequest, RegisterRequest, ChangePasswordRequest } from '@/lib/auth-api'
+import { authApi, AuthError, LoginRequest, RegisterRequest, ChangePasswordRequest, UpdateProfileRequest } from '@/lib/auth-api'
 
 export function useAuth() {
   const {
@@ -127,6 +127,43 @@ export function useAuth() {
     }
   }, [setUser])
 
+  // 更新个人信息
+  const updateProfile = useCallback(async (data: UpdateProfileRequest) => {
+    setLoading(true)
+    try {
+      const updatedUser = await authApi.updateProfile(data)
+      setUser(updatedUser)
+      message.success('个人信息更新成功')
+      return updatedUser
+    } catch (err) {
+      const authError = err as AuthError
+      message.error(authError.message || '个人信息更新失败')
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [setUser, setLoading])
+
+  // 上传头像
+  const uploadAvatar = useCallback(async (file: File) => {
+    setLoading(true)
+    try {
+      const result = await authApi.uploadAvatar(file)
+      // 更新本地用户信息中的头像
+      if (user) {
+        setUser({ ...user, avatar: result.avatar })
+      }
+      message.success('头像上传成功')
+      return result
+    } catch (err) {
+      const authError = err as AuthError
+      message.error(authError.message || '头像上传失败')
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [user, setUser, setLoading])
+
   return {
     // 状态
     user,
@@ -142,6 +179,8 @@ export function useAuth() {
     logout,
     changePassword,
     refreshUser,
+    updateProfile,
+    uploadAvatar,
 
     // 权限检查
     isInstructor: isInstructor(),

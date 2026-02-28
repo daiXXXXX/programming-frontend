@@ -40,6 +40,14 @@ export interface ChangePasswordRequest {
   newPassword: string
 }
 
+// 更新个人信息请求
+export interface UpdateProfileRequest {
+  username: string
+  email: string
+  avatar: string
+  bio: string
+}
+
 // API错误
 export class AuthError extends Error {
   constructor(
@@ -145,6 +153,43 @@ export const authApi = {
       body: JSON.stringify(data),
       requireAuth: true,
     })
+  },
+
+  // 更新个人信息
+  updateProfile: async (data: UpdateProfileRequest): Promise<User> => {
+    return authFetch<User>('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      requireAuth: true,
+    })
+  },
+
+  // 上传头像
+  uploadAvatar: async (file: File): Promise<{ avatar: string; message: string }> => {
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    const { accessToken } = getStoredAuth()
+    const headers: Record<string, string> = {}
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`
+    }
+
+    const response = await fetch(`${API_BASE}/auth/avatar`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({
+        error: 'unknown_error',
+        message: 'An unknown error occurred',
+      }))
+      throw new AuthError(error.message, error.error, response.status)
+    }
+
+    return response.json()
   },
 }
 

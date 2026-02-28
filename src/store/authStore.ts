@@ -10,6 +10,8 @@ export interface User {
   username: string
   email: string
   role: UserRole
+  avatar: string
+  bio: string
   createdAt: string
 }
 
