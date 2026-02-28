@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Problem, Submission } from '@/lib/api'
-import { Card, Button, Input, Tag, Divider, Typography, Empty } from 'antd'
+import { Card, Button, Tag, Divider, Typography, Empty, Select } from 'antd'
 import { 
   ArrowLeftOutlined, 
   PlayCircleFilled, 
@@ -13,26 +13,27 @@ import {
 import { format } from 'date-fns'
 import { motion } from 'framer-motion'
 import { useI18n } from '@/hooks/use-i18n'
+import { CodeEditor } from '@/components/CodeEditor'
 
-const { TextArea } = Input
 const { Title, Text, Paragraph } = Typography
 
 interface ProblemDetailProps {
   problem: Problem
   submissions: Submission[]
   onBack: () => void
-  onSubmit: (problemId: string, code: string) => Promise<Submission | undefined> | Submission | undefined
+  onSubmit: (problemId: string, code: string, language: string) => Promise<Submission | undefined> | Submission | undefined
 }
 
 export function ProblemDetail({ problem, submissions, onBack, onSubmit }: ProblemDetailProps) {
   const { t } = useI18n()
   const [code, setCode] = useState('')
+  const [language, setLanguage] = useState('JavaScript')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [lastSubmission, setLastSubmission] = useState<Submission | null>(null)
 
   const handleSubmit = async () => {
     setIsSubmitting(true)
-    const result = await onSubmit(String(problem.id), code)
+    const result = await onSubmit(String(problem.id), code, language)
     if (result) {
       setLastSubmission(result)
     }
@@ -163,19 +164,27 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
 
         <div className="space-y-6">
           <Card title={t('problemDetail.yourCode')}>
-            <TextArea
+            <CodeEditor
               value={code}
-              onChange={(e) => setCode(e.target.value)}
+              onChange={setCode}
+              language={language}
+              height="400px"
               placeholder={t('problemDetail.writeCodeHere')}
-              className="font-mono text-sm"
-              style={{ minHeight: 400, resize: 'vertical' }}
-              id="code-editor"
             />
-            <div style={{ marginTop: 8, marginBottom: 8 }}>
+            <div style={{ marginTop: 12, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Text type="secondary" className="text-xs">
-                {t('problemDetail.supportedLanguages')}：
+                {t('problemDetail.language')}：
               </Text>
-              <Tag color="gold" style={{ marginLeft: 4 }}>JavaScript</Tag>
+              <Select
+                value={language}
+                onChange={setLanguage}
+                style={{ width: 140 }}
+                size="small"
+                options={[
+                  { value: 'JavaScript', label: 'JavaScript' },
+                  { value: 'C', label: 'C' },
+                ]}
+              />
             </div>
             <Button
               type="primary"

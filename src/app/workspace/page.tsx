@@ -44,11 +44,11 @@ export default function WorkspacePage() {
   const solvedProblems = getSolvedProblemIds()
   const loading = problemsLoading || submissionsLoading
 
-  const handleSubmitCode = async (problemId: string, code: string): Promise<Submission | undefined> => {
+  const handleSubmitCode = async (problemId: string, code: string, language: string = 'JavaScript'): Promise<Submission | undefined> => {
     const submission = await submitCode({
       problemId: Number(problemId),
       code,
-      language: 'JavaScript'
+      language,
     })
     return submission ?? undefined
   }

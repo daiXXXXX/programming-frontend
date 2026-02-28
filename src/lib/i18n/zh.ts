@@ -90,6 +90,7 @@ const zh: Record<string, string> = {
   'problemDetail.executionTime': '执行时间',
   'problemDetail.writeCodeHere': '在这里编写你的代码...',
   'problemDetail.supportedLanguages': '当前支持的语言',
+  'problemDetail.language': '编程语言',
   'problemDetail.recentSubmissions': '最近提交',
   'problemDetail.noSubmissions': '暂无提交记录',
   'problemDetail.viewCode': '查看代码',

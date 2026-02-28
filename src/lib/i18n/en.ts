@@ -90,6 +90,7 @@ const en: Record<string, string> = {
   'problemDetail.executionTime': 'Execution Time',
   'problemDetail.writeCodeHere': 'Write your code here...',
   'problemDetail.supportedLanguages': 'Supported languages',
+  'problemDetail.language': 'Language',
   'problemDetail.recentSubmissions': 'Recent Submissions',
   'problemDetail.noSubmissions': 'No submissions yet',
   'problemDetail.viewCode': 'View Code',
