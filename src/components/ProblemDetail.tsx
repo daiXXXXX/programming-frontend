@@ -1,0 +1,237 @@
+'use client'
+
+import { useState } from 'react'
+import { Problem, Submission } from '@/lib/api'
+import { Card, Button, Input, Tag, Divider, Typography, Empty } from 'antd'
+import { 
+  ArrowLeftOutlined, 
+  PlayCircleFilled, 
+  CheckCircleFilled, 
+  CloseCircleFilled,
+  ClockCircleOutlined
+} from '@ant-design/icons'
+import { format } from 'date-fns'
+import { motion } from 'framer-motion'
+import { useI18n } from '@/hooks/use-i18n'
+
+const { TextArea } = Input
+const { Title, Text, Paragraph } = Typography
+
+interface ProblemDetailProps {
+  problem: Problem
+  submissions: Submission[]
+  onBack: () => void
+  onSubmit: (problemId: string, code: string) => Promise<Submission | undefined> | Submission | undefined
+}
+
+export function ProblemDetail({ problem, submissions, onBack, onSubmit }: ProblemDetailProps) {
+  const { t } = useI18n()
+  const [code, setCode] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [lastSubmission, setLastSubmission] = useState<Submission | null>(null)
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    const result = await onSubmit(String(problem.id), code)
+    if (result) {
+      setLastSubmission(result)
+    }
+    setTimeout(() => setIsSubmitting(false), 1000)
+  }
+
+  const recentSubmissions = submissions
+    .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+    .slice(0, 5)
+
+  const getStatusIcon = (status: Submission['status']) => {
+    switch (status) {
+      case 'Accepted':
+        return <CheckCircleFilled style={{ color: '#52c41a', fontSize: 16 }} />
+      case 'Wrong Answer':
+      case 'Runtime Error':
+        return <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 16 }} />
+      default:
+        return <ClockCircleOutlined style={{ color: '#8c8c8c', fontSize: 16 }} />
+    }
+  }
+
+  const getStatusColor = (status: Submission['status']): "success" | "error" | "warning" | "default" => {
+    switch (status) {
+      case 'Accepted':
+        return 'success'
+      case 'Wrong Answer':
+        return 'error'
+      case 'Runtime Error':
+        return 'warning'
+      default:
+        return 'default'
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Button icon={<ArrowLeftOutlined />} onClick={onBack}>
+          {t('problemDetail.backToList')}
+        </Button>
+        <Title level={3} style={{ margin: 0 }}>{problem.title}</Title>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <Card>
+            <Title level={5}>{t('problemDetail.description')}</Title>
+            <Paragraph className="text-sm leading-relaxed">{problem.description}</Paragraph>
+
+            <Divider />
+
+            <div className="space-y-4">
+              <div>
+                <Text strong className="text-sm">{t('problemDetail.inputFormat')}</Text>
+                <Paragraph type="secondary" className="text-sm whitespace-pre-line">{problem.inputFormat}</Paragraph>
+              </div>
+
+              <div>
+                <Text strong className="text-sm">{t('problemDetail.outputFormat')}</Text>
+                <Paragraph type="secondary" className="text-sm whitespace-pre-line">{problem.outputFormat}</Paragraph>
+              </div>
+
+              <div>
+                <Text strong className="text-sm">{t('problemDetail.constraints')}</Text>
+                <Paragraph type="secondary" className="text-sm whitespace-pre-line">{problem.constraints}</Paragraph>
+              </div>
+            </div>
+
+            <Divider />
+
+            <div>
+              <Text strong className="text-sm">{t('problemDetail.examples')}</Text>
+              <div className="space-y-4 mt-3">
+                {problem.examples.map((example, idx) => (
+                  <Card key={idx} size="small" style={{ backgroundColor: '#fafafa' }}>
+                    <div className="space-y-2">
+                      <div>
+                        <Text type="secondary" className="text-xs">{t('problemDetail.input')}:</Text>
+                        <pre className="text-sm font-mono bg-white p-2 rounded mt-1">{example.input}</pre>
+                      </div>
+                      <div>
+                        <Text type="secondary" className="text-xs">{t('problemDetail.output')}:</Text>
+                        <pre className="text-sm font-mono bg-white p-2 rounded mt-1">{example.output}</pre>
+                      </div>
+                      {example.explanation && (
+                        <div>
+                          <Text type="secondary" className="text-xs">{t('problemDetail.explanation')}:</Text>
+                          <Paragraph type="secondary" className="text-xs mt-1">{example.explanation}</Paragraph>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          <Card title={t('problemDetail.recentSubmissions')}>
+            {recentSubmissions.length === 0 ? (
+              <Empty description={t('problemDetail.noSubmissions')} />
+            ) : (
+              <div className="space-y-2">
+                {recentSubmissions.map(sub => (
+                  <div 
+                    key={sub.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      {getStatusIcon(sub.status)}
+                      <div>
+                        <Text strong className="text-sm">{sub.status}</Text>
+                        <br />
+                        <Text type="secondary" className="text-xs">
+                          {format(new Date(sub.submittedAt), 'MMM d, HH:mm')}
+                        </Text>
+                      </div>
+                    </div>
+                    <Tag color={getStatusColor(sub.status)}>
+                      {sub.score}%
+                    </Tag>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
+
+        <div className="space-y-6">
+          <Card title={t('problemDetail.yourCode')}>
+            <TextArea
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder={t('problemDetail.writeCodeHere')}
+              className="font-mono text-sm"
+              style={{ minHeight: 400, resize: 'vertical' }}
+              id="code-editor"
+            />
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              disabled={isSubmitting || !code.trim()}
+              block
+              size="large"
+              icon={<PlayCircleFilled />}
+              style={{ marginTop: 16 }}
+            >
+              {isSubmitting ? t('problemDetail.submitting') : t('problemDetail.submit')}
+            </Button>
+          </Card>
+
+          {lastSubmission && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card title={t('problemDetail.testResults')}>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Text strong className="text-sm">{t('history.status')}</Text>
+                    <Tag color={getStatusColor(lastSubmission.status)}>
+                      {lastSubmission.status}
+                    </Tag>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Text strong className="text-sm">{t('history.score')}</Text>
+                    <Text strong className="text-lg">{lastSubmission.score}%</Text>
+                  </div>
+                  <Divider />
+                  <div>
+                    <Text strong className="text-sm">{t('problemDetail.testCase')}</Text>
+                    <div className="space-y-2 mt-2">
+                      {lastSubmission.testResults?.map((result, idx) => (
+                        <div 
+                          key={result.testCaseId}
+                          className="flex items-center justify-between p-2 rounded bg-gray-50"
+                        >
+                          <div className="flex items-center gap-2">
+                            {result.passed ? (
+                              <CheckCircleFilled style={{ color: '#52c41a', fontSize: 16 }} />
+                            ) : (
+                              <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 16 }} />
+                            )}
+                            <Text className="text-sm">{t('problemDetail.testCase')} {idx + 1}</Text>
+                          </div>
+                          {result.executionTime !== undefined && (
+                            <Text type="secondary" className="text-xs">{result.executionTime}ms</Text>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

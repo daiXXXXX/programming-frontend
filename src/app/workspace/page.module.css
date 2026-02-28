@@ -1,0 +1,103 @@
+/* 页面级别的CSS样式，使用CSS Modules
+   类名会被自动哈希处理 */
+
+.container {
+  min-height: 100vh;
+}
+
+.container:global(.loading) {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.header {
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.headerLogo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.headerLogoIcon {
+  color: oklch(0.45 0.15 250);
+}
+
+.headerLogoTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.headerLogoSubtitle {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.headerStats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.headerStatsTrophy {
+  color: oklch(0.65 0.18 200);
+}
+
+.headerStatsCount {
+  font-weight: 600;
+}
+
+.main {
+  padding: 2rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .main {
+    padding: 2rem;
+  }
+}
+
+.tabsContainer {
+  margin-bottom: 2rem;
+}
+
+.tabTrigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.problemsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.problemsHeaderTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.problemsHeaderFilters {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.animated {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

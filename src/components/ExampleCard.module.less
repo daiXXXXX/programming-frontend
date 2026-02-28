@@ -1,0 +1,78 @@
+// 示例组件的Less模块样式
+// 使用Less语法和CSS Modules
+
+@import '../styles/variables.less';
+
+.card {
+  padding: @spacing-lg;
+  border-radius: @radius-lg;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  .shadow-sm();
+  .transition-base();
+
+  &:hover {
+    .shadow-md();
+    border-color: @accent-color;
+  }
+}
+
+.cardHeader {
+  .flex-between();
+  margin-bottom: @spacing-md;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.cardBadge {
+  padding: @spacing-xs @spacing-sm;
+  border-radius: @radius-sm;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &.easy {
+    background-color: fade(@success-color, 10%);
+    color: @success-color;
+  }
+
+  &.medium {
+    background-color: fade(@warning-color, 10%);
+    color: @warning-color;
+  }
+
+  &.hard {
+    background-color: fade(@destructive-color, 10%);
+    color: @destructive-color;
+  }
+}
+
+.cardContent {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  .line-clamp(3);
+}
+
+.cardFooter {
+  .flex-between();
+  margin-top: @spacing-md;
+  padding-top: @spacing-md;
+  border-top: 1px solid var(--border);
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @spacing-xs;
+}
+
+.cardTag {
+  padding: @spacing-xs @spacing-sm;
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  border-radius: @radius-sm;
+  font-size: 0.75rem;
+}

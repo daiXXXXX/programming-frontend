@@ -1,0 +1,78 @@
+// 全局Less变量和混合
+// 这个文件展示如何在Next.js项目中使用Less
+
+// 颜色变量
+@primary-color: oklch(0.45 0.15 250);
+@accent-color: oklch(0.65 0.18 200);
+@success-color: oklch(0.65 0.17 150);
+@warning-color: oklch(0.75 0.15 70);
+@destructive-color: oklch(0.60 0.22 25);
+
+// 间距变量
+@spacing-xs: 0.25rem;
+@spacing-sm: 0.5rem;
+@spacing-md: 1rem;
+@spacing-lg: 1.5rem;
+@spacing-xl: 2rem;
+
+// 圆角变量
+@radius-sm: 0.25rem;
+@radius-md: 0.5rem;
+@radius-lg: 1rem;
+@radius-full: 9999px;
+
+// 阴影混合
+.shadow-sm() {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.shadow-md() {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.shadow-lg() {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+// Flexbox混合
+.flex-center() {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between() {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// 响应式断点
+@screen-sm: 640px;
+@screen-md: 768px;
+@screen-lg: 1024px;
+@screen-xl: 1280px;
+
+// 动画混合
+.transition-base() {
+  transition: all 0.2s ease-in-out;
+}
+
+.transition-colors() {
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+// 截断文本
+.truncate() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 多行截断
+.line-clamp(@lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: @lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

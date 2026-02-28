@@ -1,0 +1,132 @@
+// 中文翻译
+const zh: Record<string, string> = {
+  // 首页
+  'home.greeting.morning': '早上好',
+  'home.greeting.forenoon': '上午好',
+  'home.greeting.afternoon': '下午好',
+  'home.greeting.evening': '晚上好',
+  'home.welcome': '欢迎使用编程实验平台',
+  'home.subtitle': '在线编程练习、实时评测、高效学习',
+  'home.startCoding': '开始编程',
+  'home.viewProblems': '浏览题库',
+  'home.features.practice.title': '在线编程',
+  'home.features.practice.description': '支持多种编程语言，在线编写和运行代码',
+  'home.features.realtime.title': '实时评测',
+  'home.features.realtime.description': '即时反馈测试结果，快速定位问题',
+  'home.features.progress.title': '进度追踪',
+  'home.features.progress.description': '记录学习历程，可视化展示学习进度',
+  'home.stats.problems': '题目数量',
+  'home.stats.submissions': '提交次数',
+  'home.stats.users': '活跃用户',
+  'home.guest': '同学',
+
+  // 头部
+  'header.title': '在线判题平台',
+  'header.subtitle': '程序设计实验辅助教学平台',
+  'header.solved': '已解决',
+  'header.ranking': '排行榜',
+
+  // 排行榜
+  'ranking.title': '刷题排行榜',
+  'ranking.totalTab': '总榜',
+  'ranking.todayTab': '今日榜',
+  'ranking.noData': '暂无排行数据',
+
+  // 标签页
+  'tabs.dashboard': '仪表板',
+  'tabs.problems': '题目',
+  'tabs.history': '历史',
+
+  // 仪表板
+  'dashboard.title': '概览',
+  'dashboard.totalProblems': '总题目数',
+  'dashboard.solved': '已解决',
+  'dashboard.successRate': '通过率',
+  'dashboard.totalSubmissions': '总提交数',
+  'dashboard.recentActivity': '最近活动',
+  'dashboard.noActivity': '暂无提交记录',
+  'dashboard.difficultyBreakdown': '难度分布',
+  'dashboard.easy': '简单',
+  'dashboard.medium': '中等',
+  'dashboard.hard': '困难',
+  'dashboard.quickStart': '快速开始',
+  'dashboard.startPracticing': '开始练习',
+
+  // 题目列表
+  'problems.title': '题目列表',
+  'problems.all': '全部',
+  'problems.easy': '简单',
+  'problems.medium': '中等',
+  'problems.hard': '困难',
+  'problems.difficulty': '难度',
+  'problems.status': '状态',
+  'problems.solved': '已解决',
+  'problems.unsolved': '未解决',
+  'problems.tags': '标签',
+  'problems.viewProblem': '查看题目',
+  'problems.noProblems': '暂无题目',
+
+  // 题目详情
+  'problemDetail.backToList': '返回列表',
+  'problemDetail.description': '题目描述',
+  'problemDetail.inputFormat': '输入格式',
+  'problemDetail.outputFormat': '输出格式',
+  'problemDetail.constraints': '约束条件',
+  'problemDetail.examples': '示例',
+  'problemDetail.example': '示例',
+  'problemDetail.input': '输入',
+  'problemDetail.output': '输出',
+  'problemDetail.explanation': '解释',
+  'problemDetail.yourCode': '你的代码',
+  'problemDetail.submit': '提交',
+  'problemDetail.submitting': '提交中...',
+  'problemDetail.testResults': '测试结果',
+  'problemDetail.testCase': '测试用例',
+  'problemDetail.passed': '通过',
+  'problemDetail.failed': '失败',
+  'problemDetail.expectedOutput': '期望输出',
+  'problemDetail.yourOutput': '你的输出',
+  'problemDetail.executionTime': '执行时间',
+  'problemDetail.writeCodeHere': '在这里编写你的代码...',
+  'problemDetail.recentSubmissions': '最近提交',
+  'problemDetail.noSubmissions': '暂无提交记录',
+  'problemDetail.viewCode': '查看代码',
+
+  // 提交历史
+  'history.title': '提交历史',
+  'history.noSubmissions': '暂无提交记录',
+  'history.problem': '题目',
+  'history.language': '语言',
+  'history.status': '状态',
+  'history.score': '得分',
+  'history.submittedAt': '提交时间',
+  'history.view': '查看',
+  'history.accepted': '通过',
+  'history.wrongAnswer': '答案错误',
+  'history.runtimeError': '运行错误',
+
+  // 状态
+  'status.accepted': '通过',
+  'status.wrongAnswer': '答案错误',
+  'status.runtimeError': '运行错误',
+  'status.pending': '等待中',
+
+  // 消息
+  'messages.writeCodeFirst': '请先编写代码再提交',
+  'messages.allTestsPassed': '所有测试通过',
+  'messages.runtimeError': '运行错误，请检查你的代码',
+  'messages.wrongAnswer': '答案错误',
+  'messages.testsPassed': '个测试通过',
+
+  // 通用
+  'common.loading': '加载中...',
+  'common.error': '错误',
+  'common.success': '成功',
+  'common.cancel': '取消',
+  'common.confirm': '确认',
+  'common.login': '登录',
+  'common.logout': '退出登录',
+  'common.back': '返回',
+}
+
+export default zh

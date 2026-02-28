@@ -1,0 +1,132 @@
+// English translations
+const en: Record<string, string> = {
+  // Home
+  'home.greeting.morning': 'Good morning',
+  'home.greeting.forenoon': 'Good morning',
+  'home.greeting.afternoon': 'Good afternoon',
+  'home.greeting.evening': 'Good evening',
+  'home.welcome': 'Welcome to Programming Lab',
+  'home.subtitle': 'Online coding practice, real-time evaluation, efficient learning',
+  'home.startCoding': 'Start Coding',
+  'home.viewProblems': 'View Problems',
+  'home.features.practice.title': 'Online Coding',
+  'home.features.practice.description': 'Support multiple programming languages, write and run code online',
+  'home.features.realtime.title': 'Real-time Evaluation',
+  'home.features.realtime.description': 'Instant feedback on test results, quickly locate issues',
+  'home.features.progress.title': 'Progress Tracking',
+  'home.features.progress.description': 'Record learning journey, visualize learning progress',
+  'home.stats.problems': 'Problems',
+  'home.stats.submissions': 'Submissions',
+  'home.stats.users': 'Active Users',
+  'home.guest': 'Guest',
+
+  // Header
+  'header.title': 'OJ Platform',
+  'header.subtitle': 'Online Judge Practice System',
+  'header.solved': 'Solved',
+  'header.ranking': 'Ranking',
+
+  // Ranking
+  'ranking.title': 'Leaderboard',
+  'ranking.totalTab': 'All Time',
+  'ranking.todayTab': 'Today',
+  'ranking.noData': 'No ranking data',
+
+  // Tabs
+  'tabs.dashboard': 'Dashboard',
+  'tabs.problems': 'Problems',
+  'tabs.history': 'History',
+
+  // Dashboard
+  'dashboard.title': 'Overview',
+  'dashboard.totalProblems': 'Total Problems',
+  'dashboard.solved': 'Solved',
+  'dashboard.successRate': 'Success Rate',
+  'dashboard.totalSubmissions': 'Total Submissions',
+  'dashboard.recentActivity': 'Recent Activity',
+  'dashboard.noActivity': 'No submissions yet',
+  'dashboard.difficultyBreakdown': 'Difficulty Breakdown',
+  'dashboard.easy': 'Easy',
+  'dashboard.medium': 'Medium',
+  'dashboard.hard': 'Hard',
+  'dashboard.quickStart': 'Quick Start',
+  'dashboard.startPracticing': 'Start Practicing',
+
+  // Problems
+  'problems.title': 'Problem Set',
+  'problems.all': 'All',
+  'problems.easy': 'Easy',
+  'problems.medium': 'Medium',
+  'problems.hard': 'Hard',
+  'problems.difficulty': 'Difficulty',
+  'problems.status': 'Status',
+  'problems.solved': 'Solved',
+  'problems.unsolved': 'Unsolved',
+  'problems.tags': 'Tags',
+  'problems.viewProblem': 'View Problem',
+  'problems.noProblems': 'No problems available',
+
+  // Problem Detail
+  'problemDetail.backToList': 'Back to List',
+  'problemDetail.description': 'Description',
+  'problemDetail.inputFormat': 'Input Format',
+  'problemDetail.outputFormat': 'Output Format',
+  'problemDetail.constraints': 'Constraints',
+  'problemDetail.examples': 'Examples',
+  'problemDetail.example': 'Example',
+  'problemDetail.input': 'Input',
+  'problemDetail.output': 'Output',
+  'problemDetail.explanation': 'Explanation',
+  'problemDetail.yourCode': 'Your Code',
+  'problemDetail.submit': 'Submit',
+  'problemDetail.submitting': 'Submitting...',
+  'problemDetail.testResults': 'Test Results',
+  'problemDetail.testCase': 'Test Case',
+  'problemDetail.passed': 'Passed',
+  'problemDetail.failed': 'Failed',
+  'problemDetail.expectedOutput': 'Expected Output',
+  'problemDetail.yourOutput': 'Your Output',
+  'problemDetail.executionTime': 'Execution Time',
+  'problemDetail.writeCodeHere': 'Write your code here...',
+  'problemDetail.recentSubmissions': 'Recent Submissions',
+  'problemDetail.noSubmissions': 'No submissions yet',
+  'problemDetail.viewCode': 'View Code',
+
+  // History
+  'history.title': 'Submission History',
+  'history.noSubmissions': 'No submissions yet',
+  'history.problem': 'Problem',
+  'history.language': 'Language',
+  'history.status': 'Status',
+  'history.score': 'Score',
+  'history.submittedAt': 'Submitted At',
+  'history.view': 'View',
+  'history.accepted': 'Accepted',
+  'history.wrongAnswer': 'Wrong Answer',
+  'history.runtimeError': 'Runtime Error',
+
+  // Status
+  'status.accepted': 'Accepted',
+  'status.wrongAnswer': 'Wrong Answer',
+  'status.runtimeError': 'Runtime Error',
+  'status.pending': 'Pending',
+
+  // Messages
+  'messages.writeCodeFirst': 'Please write some code before submitting',
+  'messages.allTestsPassed': 'All tests passed',
+  'messages.runtimeError': 'Runtime Error. Check your code for errors',
+  'messages.wrongAnswer': 'Wrong Answer',
+  'messages.testsPassed': 'tests passed',
+
+  // Common
+  'common.loading': 'Loading...',
+  'common.error': 'Error',
+  'common.success': 'Success',
+  'common.cancel': 'Cancel',
+  'common.confirm': 'Confirm',
+  'common.login': 'Login',
+  'common.logout': 'Logout',
+  'common.back': 'Back',
+}
+
+export default en
