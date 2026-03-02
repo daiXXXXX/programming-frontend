@@ -107,7 +107,7 @@ CREATE TABLE users (
 
 | Token类型     | 有效期 | 用途             |
 | ------------- | ------ | ---------------- |
-| Access Token  | 15分钟 | API请求认证      |
+| Access Token  | 1小时  | API请求认证      |
 | Refresh Token | 7天    | 刷新Access Token |
 
 ### Claims 结构
