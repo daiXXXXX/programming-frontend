@@ -10,7 +10,7 @@ import {
   Lightning,
   ArrowRight,
 } from '@phosphor-icons/react'
-import { LoginOutlined } from '@ant-design/icons'
+import { LoginOutlined, SettingOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -98,6 +98,13 @@ export default function HomePage() {
 
           <div className={styles.headerActions}>
             <LanguageSwitcher />
+            {isAuthenticated && user && (user.role === 'instructor' || user.role === 'admin') && (
+              <Link href="/manager">
+                <Button type="default" icon={<SettingOutlined />}>
+                  {t('header.manager')}
+                </Button>
+              </Link>
+            )}
             {isAuthenticated && user ? (
               <Link href="/workspace">
                 <Button type="primary" icon={<Rocket size={16} />}>

@@ -40,7 +40,7 @@ class ApiClient {
     this.baseURL = baseURL
   }
 
-  private async request<T>(
+  async request<T>(
     endpoint: string,
     options?: RequestInit & { requireAuth?: boolean }
   ): Promise<T> {

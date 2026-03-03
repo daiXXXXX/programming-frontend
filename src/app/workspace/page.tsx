@@ -8,7 +8,7 @@ import {
   List,
   Trophy,
 } from '@phosphor-icons/react'
-import { UserOutlined, LogoutOutlined, LoginOutlined, EditOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, LoginOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { ProblemList } from '@/components/ProblemList'
 import { ProblemDetail } from '@/components/ProblemDetail'
@@ -192,6 +192,14 @@ export default function WorkspacePage() {
                     <span>{t('header.ranking')}</span>
                   </Button>
                 </Link>
+                {(user?.role === 'instructor' || user?.role === 'admin') && (
+                  <Link href="/manager">
+                    <Button type="text" className="flex items-center gap-1.5 text-gray-600 hover:text-indigo-600">
+                      <SettingOutlined />
+                      <span>{t('header.manager')}</span>
+                    </Button>
+                  </Link>
+                )}
                 <LanguageSwitcher />
                 
                 {isAuthenticated && user ? (
