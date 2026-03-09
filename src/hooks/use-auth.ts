@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { message } from 'antd'
 import { useAuthStore, User, UserRole } from '@/store/authStore'
+import { useAppStore } from '@/store/appStore'
 import { authApi, AuthError, LoginRequest, RegisterRequest, ChangePasswordRequest, UpdateProfileRequest } from '@/lib/auth-api'
 
 export function useAuth() {
@@ -23,6 +24,8 @@ export function useAuth() {
     isAdmin,
     hasPermission,
   } = useAuthStore()
+
+  const clearAppCache = useAppStore((state) => state.clearCache)
 
   const [initialized, setInitialized] = useState(false)
 
@@ -63,6 +66,7 @@ export function useAuth() {
     setError(null)
     try {
       const response = await authApi.login(data)
+      clearAppCache()
       setAuth(response)
       message.success('登录成功')
       return response
@@ -82,6 +86,7 @@ export function useAuth() {
     setError(null)
     try {
       const response = await authApi.register(data)
+      clearAppCache()
       setAuth(response)
       message.success('注册成功')
       return response
@@ -98,8 +103,9 @@ export function useAuth() {
   // 登出
   const logout = useCallback(() => {
     storeLogout()
+    clearAppCache()
     message.success('已退出登录')
-  }, [storeLogout])
+  }, [storeLogout, clearAppCache])
 
   // 修改密码
   const changePassword = useCallback(async (data: ChangePasswordRequest) => {
