@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 import { Problem, Submission } from '@/lib/api'
-import { Card, Tag, Typography, Row, Col, Statistic } from 'antd'
-import { TrophyOutlined, CheckCircleFilled, FireOutlined, RiseOutlined } from '@ant-design/icons'
+import { Card, Tag, Typography, Row, Col, Statistic, Empty } from 'antd'
+import { TrophyOutlined, CheckCircleFilled, FireOutlined, RiseOutlined, BarChartOutlined, PieChartOutlined } from '@ant-design/icons'
 import * as echarts from 'echarts'
 import { motion } from 'framer-motion'
 import { useI18n } from '@/hooks/use-i18n'
@@ -263,13 +263,29 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           <Card>
-            <div ref={chartRef} style={{ width: '100%', height: '300px' }} />
+            {submissions.length === 0 ? (
+              <div style={{ width: '100%', height: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <BarChartOutlined style={{ fontSize: 48, color: '#d9d9d9', marginBottom: 16 }} />
+                <Text type="secondary" style={{ fontSize: 16, marginBottom: 4 }}>{t('dashboard.recentActivity')}</Text>
+                <Text type="secondary" style={{ fontSize: 13 }}>{t('dashboard.noActivityChart')}</Text>
+              </div>
+            ) : (
+              <div ref={chartRef} style={{ width: '100%', height: '300px' }} />
+            )}
           </Card>
         </Col>
 
         <Col xs={24} md={12}>
           <Card>
-            <div ref={pieChartRef} style={{ width: '100%', height: '300px' }} />
+            {totalSolved === 0 ? (
+              <div style={{ width: '100%', height: '300px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <PieChartOutlined style={{ fontSize: 48, color: '#d9d9d9', marginBottom: 16 }} />
+                <Text type="secondary" style={{ fontSize: 16, marginBottom: 4 }}>{t('dashboard.difficultyBreakdown')}</Text>
+                <Text type="secondary" style={{ fontSize: 13 }}>{t('dashboard.noDifficultyChart')}</Text>
+              </div>
+            ) : (
+              <div ref={pieChartRef} style={{ width: '100%', height: '300px' }} />
+            )}
           </Card>
         </Col>
       </Row>

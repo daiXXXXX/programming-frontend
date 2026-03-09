@@ -51,6 +51,8 @@ const zh: Record<string, string> = {
   'dashboard.hard': '困难',
   'dashboard.quickStart': '快速开始',
   'dashboard.startPracticing': '开始练习',
+  'dashboard.noActivityChart': '完成题目后，这里将展示你的提交趋势',
+  'dashboard.noDifficultyChart': '完成题目后，这里将展示各难度的解题分布',
 
   // 题目列表
   'problems.title': '题目列表',

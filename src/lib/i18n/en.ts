@@ -51,6 +51,8 @@ const en: Record<string, string> = {
   'dashboard.hard': 'Hard',
   'dashboard.quickStart': 'Quick Start',
   'dashboard.startPracticing': 'Start Practicing',
+  'dashboard.noActivityChart': 'Your submission trends will appear here after you solve problems',
+  'dashboard.noDifficultyChart': 'Difficulty breakdown will appear here after you solve problems',
 
   // Problems
   'problems.title': 'Problem Set',
