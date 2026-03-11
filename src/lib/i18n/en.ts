@@ -189,6 +189,17 @@ const en: Record<string, string> = {
   'profile.role.instructor': 'Instructor',
   'profile.role.admin': 'Admin',
 
+  // Submission Detail
+  'submission.title': 'Submission',
+  'submission.sourceCode': 'Source Code',
+  'submission.testOverview': 'Test Overview',
+  'submission.passRate': 'Pass Rate',
+  'submission.passed': 'Passed',
+  'submission.notFound': 'Submission not found',
+  'submission.loadError': 'Failed to load submission',
+  'submission.timeLimitExceeded': 'Time Limit Exceeded',
+  'submission.viewDetail': 'View Detail',
+
   // Contribution Wall
   'profile.wall.title': 'Contribution Activity',
   'profile.wall.totalSubmissions': 'Submissions this year',
@@ -198,6 +209,12 @@ const en: Record<string, string> = {
   'profile.wall.days': 'days',
   'profile.wall.less': 'Less',
   'profile.wall.more': 'More',
+
+  // Mobile tab bar
+  'mobile.tab.home': 'Home',
+  'mobile.tab.workspace': 'Practice',
+  'mobile.tab.ranking': 'Rank',
+  'mobile.tab.profile': 'Profile',
 }
 
 export default en

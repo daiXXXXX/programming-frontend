@@ -2,15 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Card, Form, Input, Button, Tabs, Typography, Divider, Select } from 'antd'
+import { Card, Form, Input, Button, Tabs, Typography, Select } from 'antd'
 import { UserOutlined, LockOutlined, MailOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { Code } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 import { useAuth, getRoleLabel } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { useMobileRedirect } from '@/hooks/use-mobile'
-import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { UserRole } from '@/store/authStore'
 
 const { Title, Text } = Typography
@@ -28,7 +26,7 @@ interface RegisterFormValues {
   role: UserRole
 }
 
-export default function LoginPage() {
+export default function MobileLoginPage() {
   const router = useRouter()
   const { login, register, isLoading } = useAuth()
   const { t, language } = useI18n()
@@ -40,7 +38,7 @@ export default function LoginPage() {
   const handleLogin = async (values: LoginFormValues) => {
     try {
       await login(values)
-      router.push('/')
+      router.push('/home-mobile')
     } catch {
       // 错误已在hook中处理
     }
@@ -54,41 +52,57 @@ export default function LoginPage() {
         password: values.password,
         role: values.role,
       })
-      router.push('/')
+      router.push('/home-mobile')
     } catch {
       // 错误已在hook中处理
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="absolute top-4 left-4">
-        <Link href="/">
-          <Button icon={<ArrowLeftOutlined />} type="text">
-            {language === 'zh' ? '返回首页' : 'Back'}
-          </Button>
-        </Link>
-      </div>
-      <div className="absolute top-4 right-4">
-        <LanguageSwitcher />
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(180deg, #f0f2ff 0%, #f5f5f5 100%)',
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      {/* Top bar */}
+      <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'flex-start' }}>
+        <Button 
+          icon={<ArrowLeftOutlined />} 
+          type="text" 
+          onClick={() => router.push('/home-mobile')}
+        >
+          {language === 'zh' ? '返回' : 'Back'}
+        </Button>
       </div>
 
+      {/* Logo area */}
+      <div style={{ textAlign: 'center', padding: '24px 0 20px' }}>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 56,
+          height: 56,
+          background: '#eef2ff',
+          borderRadius: '50%',
+          marginBottom: 12,
+        }}>
+          <Code size={28} weight="duotone" style={{ color: '#4f46e5' }} />
+        </div>
+        <Title level={4} style={{ margin: 0 }}>
+          {language === 'zh' ? '编程实验平台' : 'Programming Lab'}
+        </Title>
+      </div>
+
+      {/* Form */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="w-full max-w-sm"
+        style={{ padding: '0 16px', flex: 1 }}
       >
-        <Card className="shadow-lg" style={{ borderRadius: 12 }}>
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-full mb-3">
-              <Code size={24} weight="duotone" className="text-indigo-600" />
-            </div>
-            <Title level={3} style={{ margin: 0 }}>
-              {language === 'zh' ? '编程实验平台' : 'Programming Lab'}
-            </Title>
-          </div>
-
+        <Card style={{ borderRadius: 16 }} styles={{ body: { padding: '20px 16px' } }}>
           <Tabs
             activeKey={activeTab}
             onChange={(key) => setActiveTab(key as 'login' | 'register')}
@@ -103,6 +117,7 @@ export default function LoginPage() {
                     form={loginForm}
                     onFinish={handleLogin}
                     layout="vertical"
+                    size="large"
                   >
                     <Form.Item
                       name="username"
@@ -114,6 +129,7 @@ export default function LoginPage() {
                         prefix={<UserOutlined />}
                         placeholder={language === 'zh' ? '用户名或邮箱' : 'Username or Email'}
                         autoComplete="username"
+                        style={{ borderRadius: 10, height: 48 }}
                       />
                     </Form.Item>
 
@@ -127,6 +143,7 @@ export default function LoginPage() {
                         prefix={<LockOutlined />}
                         placeholder={language === 'zh' ? '密码' : 'Password'}
                         autoComplete="current-password"
+                        style={{ borderRadius: 10, height: 48 }}
                       />
                     </Form.Item>
 
@@ -136,6 +153,7 @@ export default function LoginPage() {
                         htmlType="submit"
                         block
                         loading={isLoading}
+                        style={{ borderRadius: 10, height: 48, fontSize: 16 }}
                       >
                         {language === 'zh' ? '登录' : 'Login'}
                       </Button>
@@ -152,6 +170,7 @@ export default function LoginPage() {
                     onFinish={handleRegister}
                     layout="vertical"
                     initialValues={{ role: 'student' }}
+                    size="large"
                   >
                     <Form.Item
                       name="username"
@@ -164,6 +183,7 @@ export default function LoginPage() {
                       <Input
                         prefix={<UserOutlined />}
                         placeholder={language === 'zh' ? '用户名' : 'Username'}
+                        style={{ borderRadius: 10, height: 48 }}
                       />
                     </Form.Item>
 
@@ -177,6 +197,7 @@ export default function LoginPage() {
                       <Input
                         prefix={<MailOutlined />}
                         placeholder={language === 'zh' ? '邮箱' : 'Email'}
+                        style={{ borderRadius: 10, height: 48 }}
                       />
                     </Form.Item>
 
@@ -191,6 +212,7 @@ export default function LoginPage() {
                       <Input.Password
                         prefix={<LockOutlined />}
                         placeholder={language === 'zh' ? '密码' : 'Password'}
+                        style={{ borderRadius: 10, height: 48 }}
                       />
                     </Form.Item>
 
@@ -212,11 +234,12 @@ export default function LoginPage() {
                       <Input.Password
                         prefix={<LockOutlined />}
                         placeholder={language === 'zh' ? '确认密码' : 'Confirm Password'}
+                        style={{ borderRadius: 10, height: 48 }}
                       />
                     </Form.Item>
 
                     <Form.Item name="role" label={language === 'zh' ? '身份' : 'Role'}>
-                      <Select>
+                      <Select style={{ borderRadius: 10 }}>
                         <Select.Option value="student">{getRoleLabel('student')}</Select.Option>
                         <Select.Option value="instructor">{getRoleLabel('instructor')}</Select.Option>
                       </Select>
@@ -228,6 +251,7 @@ export default function LoginPage() {
                         htmlType="submit"
                         block
                         loading={isLoading}
+                        style={{ borderRadius: 10, height: 48, fontSize: 16 }}
                       >
                         {language === 'zh' ? '注册' : 'Register'}
                       </Button>
@@ -238,9 +262,9 @@ export default function LoginPage() {
             ]}
           />
         </Card>
-        
-        <div className="text-center mt-4">
-          <Text type="secondary" className="text-xs">
+
+        <div style={{ textAlign: 'center', marginTop: 16, paddingBottom: 32 }}>
+          <Text type="secondary" style={{ fontSize: 11 }}>
             {language === 'zh' ? '登录即表示您同意服务条款' : 'By logging in, you agree to our Terms'}
           </Text>
         </div>

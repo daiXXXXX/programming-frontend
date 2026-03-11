@@ -4,6 +4,7 @@ import { Problem, Submission } from '@/lib/api'
 import { Card, Table, Tag, Button, Empty, Typography } from 'antd'
 import { CheckCircleFilled, CloseCircleFilled, CodeOutlined } from '@ant-design/icons'
 import { format } from 'date-fns'
+import { useRouter } from 'next/navigation'
 import { useI18n } from '@/hooks/use-i18n'
 import type { ColumnsType } from 'antd/es/table'
 
@@ -17,6 +18,7 @@ interface SubmissionHistoryProps {
 
 export function SubmissionHistory({ submissions, problems, onViewProblem }: SubmissionHistoryProps) {
   const { t } = useI18n()
+  const router = useRouter()
   
   if (submissions.length === 0) {
     return (
@@ -122,7 +124,7 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
         <Button 
           type="link" 
           size="small"
-          onClick={() => record.problem && onViewProblem(record.problem)}
+          onClick={() => router.push(`/submission/${record.id}`)}
         >
           {t('history.view')}
         </Button>

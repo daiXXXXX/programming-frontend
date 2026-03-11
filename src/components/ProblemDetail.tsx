@@ -11,6 +11,7 @@ import {
   ClockCircleOutlined
 } from '@ant-design/icons'
 import { format } from 'date-fns'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { useI18n } from '@/hooks/use-i18n'
 import { CodeEditor } from '@/components/CodeEditor'
@@ -26,6 +27,7 @@ interface ProblemDetailProps {
 
 export function ProblemDetail({ problem, submissions, onBack, onSubmit }: ProblemDetailProps) {
   const { t } = useI18n()
+  const router = useRouter()
   const [code, setCode] = useState('')
   const [language, setLanguage] = useState('JavaScript')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -140,7 +142,8 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
                 {recentSubmissions.map(sub => (
                   <div 
                     key={sub.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
+                    onClick={() => router.push(`/submission/${sub.id}`)}
                   >
                     <div className="flex items-center gap-3">
                       {getStatusIcon(sub.status)}
@@ -241,6 +244,15 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
                       ))}
                     </div>
                   </div>
+                  <Divider />
+                  <Button 
+                    type="primary" 
+                    ghost 
+                    block
+                    onClick={() => router.push(`/submission/${lastSubmission.id}`)}
+                  >
+                    {t('submission.viewDetail')}
+                  </Button>
                 </div>
               </Card>
             </motion.div>

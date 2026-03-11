@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { api, RankingUser } from '@/lib/api'
 import { useI18n } from '@/hooks'
+import { useMobileRedirect } from '@/hooks/use-mobile'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import styles from './ranking.module.css'
 
@@ -106,6 +107,7 @@ function RankingList({ users, loading, showTodaySolved = false }: {
 
 export default function RankingPage() {
   const { t } = useI18n()
+  useMobileRedirect()
   const [activeTab, setActiveTab] = useState('total')
   const [totalRanking, setTotalRanking] = useState<RankingUser[]>([])
   const [todayRanking, setTodayRanking] = useState<RankingUser[]>([])

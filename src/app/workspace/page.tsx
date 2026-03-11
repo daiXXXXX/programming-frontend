@@ -18,6 +18,7 @@ import { DashboardStats } from '@/components/DashboardStats'
 import { motion } from 'framer-motion'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useI18n, useProblems, useSubmissions, useUIState, useAuth, getRoleLabel } from '@/hooks'
+import { useMobileRedirect } from '@/hooks/use-mobile'
 import { Submission } from '@/lib/api'
 import styles from './page.module.css'
 
@@ -26,6 +27,7 @@ const { Title, Text } = Typography
 export default function WorkspacePage() {
   const { t } = useI18n()
   const router = useRouter()
+  useMobileRedirect()
   const { problems, loading: problemsLoading, searchProblems, refresh: refreshProblems } = useProblems()
   const [searchKeyword, setSearchKeyword] = useState('')
   const { submissions, loading: submissionsLoading, submitCode, getSolvedProblemIds, getProblemSubmissions } = useSubmissions()

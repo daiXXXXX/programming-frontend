@@ -189,6 +189,17 @@ const zh: Record<string, string> = {
   'profile.role.instructor': '教师',
   'profile.role.admin': '管理员',
 
+  // 提交详情
+  'submission.title': '提交详情',
+  'submission.sourceCode': '提交代码',
+  'submission.testOverview': '测试概览',
+  'submission.passRate': '通过率',
+  'submission.passed': '通过',
+  'submission.notFound': '未找到该提交记录',
+  'submission.loadError': '加载提交详情失败',
+  'submission.timeLimitExceeded': '超时',
+  'submission.viewDetail': '查看详情',
+
   // 刷题墙
   'profile.wall.title': '刷题记录',
   'profile.wall.totalSubmissions': '年度提交',
@@ -198,6 +209,12 @@ const zh: Record<string, string> = {
   'profile.wall.days': '天',
   'profile.wall.less': '少',
   'profile.wall.more': '多',
+
+  // 移动端底部导航
+  'mobile.tab.home': '首页',
+  'mobile.tab.workspace': '刷题',
+  'mobile.tab.ranking': '排行',
+  'mobile.tab.profile': '我的',
 }
 
 export default zh

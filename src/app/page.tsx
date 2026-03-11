@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useI18n, useAuth } from '@/hooks'
+import { useMobileRedirect } from '@/hooks/use-mobile'
 import styles from './home.module.css'
 
 const { Title, Text, Paragraph } = Typography
@@ -40,6 +41,7 @@ function getTimeBasedGradientClass(): string {
 export default function HomePage() {
   const { t } = useI18n()
   const { user, isAuthenticated } = useAuth()
+  useMobileRedirect()
 
   const greetingKey = getGreetingKey()
   const greeting = t(`home.greeting.${greetingKey}`)

@@ -26,6 +26,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { useI18n, useAuth } from '@/hooks'
+import { useMobileRedirect } from '@/hooks/use-mobile'
 import { ContributionWall } from '@/components/ContributionWall'
 import { api, DailyActivity } from '@/lib/api'
 
@@ -58,6 +59,7 @@ export default function ProfilePage() {
   const { t } = useI18n()
   const router = useRouter()
   const { user, isAuthenticated, updateProfile, uploadAvatar, isLoading, initialized } = useAuth()
+  useMobileRedirect()
 
   const [form] = Form.useForm()
   const [showAvatarPicker, setShowAvatarPicker] = useState(false)
