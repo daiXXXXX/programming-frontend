@@ -143,6 +143,16 @@ class ApiClient {
   async getTodaySolvedRanking(limit: number = 50) {
     return this.request<RankingUser[]>(`/ranking/today?limit=${limit}`, { requireAuth: false })
   }
+
+  // 每日活动数据 API（需要登录）
+  async getDailyActivity(userId?: number, start?: string, end?: string) {
+    const uid = userId || getCurrentUserId() || 1
+    const params = new URLSearchParams()
+    if (start) params.set('start', start)
+    if (end) params.set('end', end)
+    const query = params.toString() ? `?${params.toString()}` : ''
+    return this.request<DailyActivity[]>(`/stats/user/${uid}/activity${query}`)
+  }
 }
 
 // 导出 API 客户端实例
@@ -245,4 +255,11 @@ export interface RankingUser {
   totalSolved: number
   todaySolved: number
   rank: number
+}
+
+export interface DailyActivity {
+  userId: number
+  date: string           // "2006-01-02"
+  submissionCount: number
+  solvedCount: number
 }

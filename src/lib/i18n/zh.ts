@@ -183,9 +183,21 @@ const zh: Record<string, string> = {
   'profile.bioPlaceholder': '介绍一下你自己...',
   'profile.bioMax': '个人简介最多500个字符',
   'profile.save': '保存',
+  'profile.backToWorkspace': '返回工作台',
+  'profile.editProfile': '编辑资料',
   'profile.role.student': '学生',
   'profile.role.instructor': '教师',
   'profile.role.admin': '管理员',
+
+  // 刷题墙
+  'profile.wall.title': '刷题记录',
+  'profile.wall.totalSubmissions': '年度提交',
+  'profile.wall.totalSolved': '年度解题',
+  'profile.wall.maxStreak': '最长连续',
+  'profile.wall.currentStreak': '当前连续',
+  'profile.wall.days': '天',
+  'profile.wall.less': '少',
+  'profile.wall.more': '多',
 }
 
 export default zh

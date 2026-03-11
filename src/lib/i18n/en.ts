@@ -183,9 +183,21 @@ const en: Record<string, string> = {
   'profile.bioPlaceholder': 'Tell us about yourself...',
   'profile.bioMax': 'Bio must be at most 500 characters',
   'profile.save': 'Save',
+  'profile.backToWorkspace': 'Back to Workspace',
+  'profile.editProfile': 'Edit Profile',
   'profile.role.student': 'Student',
   'profile.role.instructor': 'Instructor',
   'profile.role.admin': 'Admin',
+
+  // Contribution Wall
+  'profile.wall.title': 'Contribution Activity',
+  'profile.wall.totalSubmissions': 'Submissions this year',
+  'profile.wall.totalSolved': 'Problems solved',
+  'profile.wall.maxStreak': 'Longest streak',
+  'profile.wall.currentStreak': 'Current streak',
+  'profile.wall.days': 'days',
+  'profile.wall.less': 'Less',
+  'profile.wall.more': 'More',
 }
 
 export default en

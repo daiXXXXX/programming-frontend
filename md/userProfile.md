@@ -626,3 +626,301 @@ Modal 关闭，message.success 提示
 | `profile.role.student`         | 学生                             | Student                                                     |
 | `profile.role.instructor`      | 教师                             | Instructor                                                  |
 | `profile.role.admin`           | 管理员                           | Admin                                                       |
+
+---
+
+## 9. 本次升级：从 Modal 到独立 `/profile` 页面
+
+本次改动对个人信息模块做了两项重要升级：
+
+1. **交互形态升级**：个人信息入口从 `workspace` 顶部下拉菜单中的弹窗，调整为独立路由页面 `/profile`
+2. **数据展示升级**：新增 GitHub 风格的刷题绿墙，用于展示用户最近一年的每日提交与解题活跃度
+
+升级后的入口关系如下：
+
+```text
+workspace 右上角用户下拉菜单
+  ↓
+点击「个人信息」
+  ↓
+router.push('/profile')
+  ↓
+进入独立 Profile 页面
+  ├─ 资料编辑卡片
+  └─ Contribution Wall 刷题绿墙
+```
+
+这样调整后，个人信息页不再受弹窗尺寸限制，更适合承载统计信息、成长记录和后续扩展功能。
+
+---
+
+## 10. 前端页面升级说明
+
+### 10.1 新增页面与组件
+
+本次新增/调整的前端文件如下：
+
+| 文件                                   | 改动说明                                                      |
+| -------------------------------------- | ------------------------------------------------------------- |
+| `src/app/profile/page.tsx`             | 新增独立个人信息页，负责资料编辑、活动数据加载和页面布局      |
+| `src/components/ContributionWall.tsx`  | 新增 GitHub 风格绿墙组件，展示最近一年每日刷题情况            |
+| `src/lib/api.ts`                       | 新增 `DailyActivity` 类型与 `getDailyActivity()` 请求方法     |
+| `src/app/workspace/page.tsx`           | 将原先打开 `ProfileModal` 的逻辑改为跳转到 `/profile`         |
+| `src/lib/i18n/zh.ts` / `src/lib/i18n/en.ts` | 新增绿墙统计项与页面导航相关文案                        |
+
+### 10.2 `/profile` 页面职责
+
+`src/app/profile/page.tsx` 的核心职责：
+
+- 校验登录状态，未登录时跳转 `/login`
+- 复用原有个人资料编辑能力（用户名、邮箱、头像、简介）
+- 展示用户角色、注册时间、当前头像
+- 拉取最近一年的每日活动数据并传给 `ContributionWall`
+- 提供“返回工作台”按钮，形成清晰导航闭环
+
+页面结构示意：
+
+```text
+/profile
+├─ 顶部 Banner
+│   ├─ 返回工作台按钮
+│   ├─ 标题 / 副标题
+├─ Profile Card
+│   ├─ 头像上传
+│   ├─ 预设头像选择
+│   ├─ 用户角色 / 注册时间
+│   └─ 资料编辑表单
+└─ Contribution Wall Card
+  ├─ 总提交数
+  ├─ 总解题数
+  ├─ 最长连续天数
+  ├─ 当前连续天数
+  └─ 最近一年热力图
+```
+
+### 10.3 `workspace` 导航逻辑调整
+
+改造前：
+
+```tsx
+onClick: () => setProfileModalOpen(true)
+```
+
+改造后：
+
+```tsx
+onClick: () => router.push('/profile')
+```
+
+这意味着：
+
+- `workspace` 页面不再直接承载个人信息弹窗的编辑逻辑
+- 用户从任意时刻都可以通过路由回到个人信息页
+- 后续如需增加“成就”“勋章”“刷题日历”“学习画像”等模块，可直接在该页面扩展
+
+---
+
+## 11. Contribution Wall（刷题绿墙）设计
+
+### 11.1 目标
+
+绿墙用于可视化用户最近一年的刷题活跃度，参考 GitHub Contribution Graph 的交互方式，但展示的是**每日刷题行为**而非代码提交。
+
+### 11.2 数据口径
+
+每个日期单元格展示两类统计：
+
+- `submissionCount`：当天提交总次数
+- `solvedCount`：当天成功解决的题目数（按题目去重）
+
+热力图颜色等级依据 `solvedCount` 计算：
+
+| 等级 | 条件                 | 颜色       | 说明     |
+| ---- | -------------------- | ---------- | -------- |
+| 0    | `count = 0`          | `#ebedf0`  | 无活动   |
+| 1    | `count <= 1`         | `#9be9a8`  | 少量活动 |
+| 2    | `count <= 3`         | `#40c463`  | 中等活动 |
+| 3    | `count <= 6`         | `#30a14e`  | 较高活动 |
+| 4    | `count > 6`          | `#216e39`  | 高强度活动 |
+
+### 11.3 展示维度
+
+`ContributionWall` 组件会基于最近一年数据计算：
+
+- **总提交数**：过去一年的所有提交次数汇总
+- **总解题数**：过去一年的所有 `solvedCount` 汇总
+- **最长连续天数**：一年内最长的连续刷题区间
+- **当前连续天数**：从今天往前连续有刷题记录的天数
+
+### 11.4 组件渲染策略
+
+前端使用 SVG 绘制热力图：
+
+- 横向按周排列，共约 53 列
+- 纵向按星期排列，共 7 行
+- 顶部显示月份标签
+- 左侧显示星期标签（中英文随语言切换）
+- 每个方块悬浮时通过 `Tooltip` 展示当天详情
+
+悬浮提示示例：
+
+```text
+2026-03-11: 2 solved, 5 submissions
+```
+
+中文下会显示：
+
+```text
+2026-03-11: 2 题解决, 5 次提交
+```
+
+---
+
+## 12. 后端支撑改动（绿墙数据）
+
+虽然本文档位于前端仓库，但为了便于联调和后续维护，下面同步记录本次绿墙能力依赖的后端改造。
+
+### 12.1 数据库迁移
+
+新增迁移文件：`programming-backend/database/migrations/002_add_daily_activity.sql`
+
+核心表结构：
+
+```sql
+CREATE TABLE IF NOT EXISTS daily_activity (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  activity_date DATE NOT NULL,
+  submission_count INT NOT NULL DEFAULT 0,
+  solved_count INT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_user_date (user_id, activity_date),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+设计意图：
+
+- `user_id + activity_date` 唯一，确保“一个用户一天只有一条聚合记录”
+- `submission_count` 直接记录当天总提交次数
+- `solved_count` 记录当天成功解决的题目数，供绿墙颜色和连续天数统计使用
+- 附加 `(user_id, activity_date)` 索引，优化按用户+时间范围查询
+
+### 12.2 提交写入时机
+
+后端在创建提交记录后，会同步更新 `daily_activity` 聚合表：
+
+```go
+if err = r.updateDailyActivity(tx, submission.UserID); err != nil {
+  return nil, err
+}
+```
+
+`updateDailyActivity()` 的逻辑是：
+
+1. 以 `CURDATE()` 为维度定位当天记录
+2. 统计当前用户当天在 `submissions` 表中的总提交数
+3. 统计当前用户当天 `Accepted` 的去重题目数
+4. 使用 `INSERT ... ON DUPLICATE KEY UPDATE` 做幂等写入
+
+这样可以保证：
+
+- 无需前端自行聚合历史提交
+- 每次新提交都会自动刷新当天活动数据
+- 热力图查询时只需读取轻量聚合表，性能更稳定
+
+### 12.3 新增 API
+
+路由：
+
+```go
+stats.GET("/user/:userId/activity", submissionHandler.GetDailyActivity)
+```
+
+接口定义：
+
+### `GET /api/stats/user/:userId/activity`
+
+**Query 参数：**
+
+| 参数    | 必填 | 说明                             |
+| ------- | ---- | -------------------------------- |
+| `start` | ❌   | 起始日期，格式 `YYYY-MM-DD`      |
+| `end`   | ❌   | 结束日期，格式 `YYYY-MM-DD`      |
+
+当 `start` / `end` 未传时，后端默认返回最近 365 天的数据。
+
+**成功响应：**
+
+```json
+[
+  {
+  "userId": 1,
+  "date": "2026-03-11",
+  "submissionCount": 5,
+  "solvedCount": 2
+  }
+]
+```
+
+### 12.4 前端调用方式
+
+`src/lib/api.ts` 中新增：
+
+```typescript
+async getDailyActivity(userId?: number, start?: string, end?: string) {
+  const uid = userId || getCurrentUserId() || 1
+  const params = new URLSearchParams()
+  if (start) params.set('start', start)
+  if (end) params.set('end', end)
+  const query = params.toString() ? `?${params.toString()}` : ''
+  return this.request<DailyActivity[]>(`/stats/user/${uid}/activity${query}`)
+}
+```
+
+`/profile` 页面在加载用户信息后，调用该接口获取活动数据：
+
+```tsx
+const data = await api.getDailyActivity(user.id)
+setActivities(data || [])
+```
+
+---
+
+## 13. 新增国际化文案
+
+在原有个人资料翻译的基础上，本次又增加了与独立页面和绿墙相关的 key：
+
+| Key                              | 中文       | English                  |
+| -------------------------------- | ---------- | ------------------------ |
+| `profile.backToWorkspace`        | 返回工作台 | Back to Workspace        |
+| `profile.editProfile`            | 编辑资料   | Edit Profile             |
+| `profile.wall.title`             | 刷题记录   | Contribution Activity    |
+| `profile.wall.totalSubmissions`  | 年度提交   | Submissions this year    |
+| `profile.wall.totalSolved`       | 年度解题   | Problems solved          |
+| `profile.wall.maxStreak`         | 最长连续   | Longest streak           |
+| `profile.wall.currentStreak`     | 当前连续   | Current streak           |
+| `profile.wall.days`              | 天         | days                     |
+| `profile.wall.less`              | 少         | Less                     |
+| `profile.wall.more`              | 多         | More                     |
+
+---
+
+## 14. 当前版本总结
+
+截至本次改造，个人信息模块已经从“仅支持弹窗编辑资料”升级为“可独立访问的用户画像页”，具备以下能力：
+
+- 支持通过 `/profile` 独立访问
+- 支持头像上传、预设头像、自定义头像 URL
+- 支持用户名、邮箱、个人简介编辑
+- 支持展示角色与注册时间
+- 支持展示最近一年的刷题绿墙
+- 支持展示年度提交、年度解题、最长连续、当前连续等活跃度指标
+
+后续如果要继续扩展个人中心，可优先考虑：
+
+- 成就/徽章系统
+- 题目难度偏好分析
+- 最近通过题目列表
+- 学习曲线与月度趋势图
+- 班级内个人排名变化

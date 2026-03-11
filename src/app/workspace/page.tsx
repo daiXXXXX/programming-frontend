@@ -10,11 +10,11 @@ import {
 } from '@phosphor-icons/react'
 import { UserOutlined, LogoutOutlined, LoginOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ProblemList } from '@/components/ProblemList'
 import { ProblemDetail } from '@/components/ProblemDetail'
 import { SubmissionHistory } from '@/components/SubmissionHistory'
 import { DashboardStats } from '@/components/DashboardStats'
-import { ProfileModal } from '@/components/ProfileModal'
 import { motion } from 'framer-motion'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useI18n, useProblems, useSubmissions, useUIState, useAuth, getRoleLabel } from '@/hooks'
@@ -25,11 +25,11 @@ const { Title, Text } = Typography
 
 export default function WorkspacePage() {
   const { t } = useI18n()
+  const router = useRouter()
   const { problems, loading: problemsLoading, searchProblems, refresh: refreshProblems } = useProblems()
   const [searchKeyword, setSearchKeyword] = useState('')
   const { submissions, loading: submissionsLoading, submitCode, getSolvedProblemIds, getProblemSubmissions } = useSubmissions()
-  const { user, isAuthenticated, logout, updateProfile, uploadAvatar, isLoading } = useAuth()
-  const [profileModalOpen, setProfileModalOpen] = useState(false)
+  const { user, isAuthenticated, logout } = useAuth()
   const { 
     activeTab, 
     filterDifficulty, 
@@ -203,7 +203,6 @@ export default function WorkspacePage() {
                 <LanguageSwitcher />
                 
                 {isAuthenticated && user ? (
-                  <>
                   <Dropdown
                     menu={{
                       items: [
@@ -222,7 +221,7 @@ export default function WorkspacePage() {
                           key: 'profile',
                           icon: <EditOutlined />,
                           label: t('profile.title'),
-                          onClick: () => setProfileModalOpen(true),
+                          onClick: () => router.push('/profile'),
                         },
                         {
                           key: 'logout',
@@ -244,15 +243,6 @@ export default function WorkspacePage() {
                       <span className="text-sm font-medium">{user.username}</span>
                     </div>
                   </Dropdown>
-                  <ProfileModal
-                    open={profileModalOpen}
-                    onClose={() => setProfileModalOpen(false)}
-                    user={user}
-                    onUpdateProfile={updateProfile}
-                    onUploadAvatar={uploadAvatar}
-                    isLoading={isLoading}
-                  />
-                  </>
                 ) : (
                   <Link href="/login">
                     <Button type="primary" icon={<LoginOutlined />}>
