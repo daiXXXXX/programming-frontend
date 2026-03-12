@@ -153,6 +153,74 @@ class ApiClient {
     const query = params.toString() ? `?${params.toString()}` : ''
     return this.request<DailyActivity[]>(`/stats/user/${uid}/activity${query}`)
   }
+
+  // ==================== 题解相关 API ====================
+
+  // 获取题目的题解列表
+  async getSolutions(problemId: number, order = 'newest', limit = 20, offset = 0) {
+    return this.request<SolutionListResponse>(
+      `/solutions/problem/${problemId}?order=${order}&limit=${limit}&offset=${offset}`,
+      { requireAuth: false }
+    )
+  }
+
+  // 获取题解详情
+  async getSolution(id: number) {
+    return this.request<Solution>(`/solutions/${id}`, { requireAuth: false })
+  }
+
+  // 创建题解
+  async createSolution(data: CreateSolutionRequest) {
+    return this.request<Solution>('/solutions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  // 更新题解
+  async updateSolution(id: number, data: UpdateSolutionRequest) {
+    return this.request<{ message: string }>(`/solutions/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  // 删除题解
+  async deleteSolution(id: number) {
+    return this.request<{ message: string }>(`/solutions/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // 点赞/取消点赞
+  async toggleSolutionLike(id: number) {
+    return this.request<{ liked: boolean; likeCount: number }>(`/solutions/${id}/like`, {
+      method: 'POST',
+    })
+  }
+
+  // 获取题解评论
+  async getSolutionComments(solutionId: number, limit = 20, offset = 0) {
+    return this.request<CommentListResponse>(
+      `/solutions/${solutionId}/comments?limit=${limit}&offset=${offset}`,
+      { requireAuth: false }
+    )
+  }
+
+  // 创建评论
+  async createComment(solutionId: number, data: CreateCommentRequest) {
+    return this.request<SolutionComment>(`/solutions/${solutionId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  // 删除评论
+  async deleteComment(commentId: number) {
+    return this.request<{ message: string }>(`/solutions/comments/${commentId}`, {
+      method: 'DELETE',
+    })
+  }
 }
 
 // 导出 API 客户端实例
@@ -262,4 +330,82 @@ export interface DailyActivity {
   date: string           // "2006-01-02"
   submissionCount: number
   solvedCount: number
+}
+
+// ==================== 题解相关类型 ====================
+
+export interface SolutionAuthor {
+  id: number
+  username: string
+  avatar: string
+}
+
+export interface Solution {
+  id: number
+  problemId: number
+  userId: number
+  title: string
+  content: string
+  viewCount: number
+  likeCount: number
+  commentCount: number
+  createdAt: string
+  updatedAt: string
+  author?: SolutionAuthor
+  liked: boolean
+}
+
+export interface SolutionComment {
+  id: number
+  solutionId: number
+  userId: number
+  parentId?: number | null
+  content: string
+  likeCount: number
+  createdAt: string
+  updatedAt: string
+  author?: SolutionAuthor
+  replies?: SolutionComment[]
+}
+
+export interface SolutionListResponse {
+  solutions: Solution[] | null
+  total: number
+  limit: number
+  offset: number
+}
+
+export interface CommentListResponse {
+  comments: SolutionComment[] | null
+  total: number
+  limit: number
+  offset: number
+}
+
+export interface CreateSolutionRequest {
+  problemId: number
+  title: string
+  content: string
+}
+
+export interface UpdateSolutionRequest {
+  title: string
+  content: string
+}
+
+export interface CreateCommentRequest {
+  content: string
+  parentId?: number | null
+}
+
+// ==================== WebSocket 消息类型 ====================
+
+export type WSMessageType = 'chat' | 'system_notice' | 'new_comment' | 'new_solution' | 'like_notify' | 'online_count'
+
+export interface WSMessage {
+  type: WSMessageType
+  channel?: string
+  from?: SolutionAuthor
+  content: any
+  timestamp: string
 }
