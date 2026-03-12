@@ -8,7 +8,8 @@ import {
   PlayCircleFilled, 
   CheckCircleFilled, 
   CloseCircleFilled,
-  ClockCircleOutlined
+  ClockCircleOutlined,
+  BookOutlined,
 } from '@ant-design/icons'
 import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
@@ -78,6 +79,12 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
           {t('problemDetail.backToList')}
         </Button>
         <Title level={3} style={{ margin: 0 }}>{problem.title}</Title>
+        <Button
+          icon={<BookOutlined />}
+          onClick={() => router.push(`/solutions/${problem.id}`)}
+        >
+          {t('solutions.entrance')}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
