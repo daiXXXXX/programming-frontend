@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Problem, Submission } from '@/lib/api'
-import { Card, Button, Tag, Divider, Typography, Empty, Select } from 'antd'
+import { Card, Button, Tag, Divider, Typography, Empty, Select, Spin } from 'antd'
 import { 
   ArrowLeftOutlined, 
   PlayCircleFilled, 
@@ -10,12 +10,15 @@ import {
   CloseCircleFilled,
   ClockCircleOutlined,
   BookOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons'
 import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { useI18n } from '@/hooks/use-i18n'
 import { CodeEditor } from '@/components/CodeEditor'
+import { useWebSocket } from '@/hooks/use-websocket'
+import { useAppStore } from '@/store/appStore'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -33,18 +36,53 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
   const [language, setLanguage] = useState('JavaScript')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [lastSubmission, setLastSubmission] = useState<Submission | null>(null)
+  const { on } = useWebSocket()
+  const updateSubmission = useAppStore(s => s.updateSubmission)
+
+  // 监听 WebSocket 评测结果
+  useEffect(() => {
+    const unsubscribe = on('judge_result', (msg) => {
+      const result = msg.content
+      if (!result) return
+
+      // 更新 store 中的提交记录
+      updateSubmission(result.submissionId, {
+        status: result.status,
+        score: result.score,
+        testResults: result.testResults,
+      })
+
+      // 如果是当前正在等待的提交，更新 lastSubmission
+      setLastSubmission(prev => {
+        if (prev && prev.id === result.submissionId) {
+          return { ...prev, status: result.status, score: result.score, testResults: result.testResults }
+        }
+        return prev
+      })
+
+      setIsSubmitting(false)
+    })
+
+    return unsubscribe
+  }, [on, updateSubmission])
 
   const handleSubmit = async () => {
     setIsSubmitting(true)
     const result = await onSubmit(String(problem.id), code, language)
     if (result) {
       setLastSubmission(result)
+      // 如果不是 Pending 状态（同步评测），1秒后恢复按钮
+      if (result.status !== 'Pending') {
+        setTimeout(() => setIsSubmitting(false), 1000)
+      }
+      // Pending 状态的 isSubmitting 会在 WebSocket 收到结果后恢复
+    } else {
+      setIsSubmitting(false)
     }
-    setTimeout(() => setIsSubmitting(false), 1000)
   }
 
   const recentSubmissions = (submissions || [])
-    .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+    .sort((a, b) => new Date(b.submittedAt || 0).getTime() - new Date(a.submittedAt || 0).getTime())
     .slice(0, 5)
 
   const getStatusIcon = (status: Submission['status']) => {
@@ -54,12 +92,14 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
       case 'Wrong Answer':
       case 'Runtime Error':
         return <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 16 }} />
+      case 'Pending':
+        return <LoadingOutlined style={{ color: '#1677ff', fontSize: 16 }} spin />
       default:
         return <ClockCircleOutlined style={{ color: '#8c8c8c', fontSize: 16 }} />
     }
   }
 
-  const getStatusColor = (status: Submission['status']): "success" | "error" | "warning" | "default" => {
+  const getStatusColor = (status: Submission['status']): "success" | "error" | "warning" | "default" | "processing" => {
     switch (status) {
       case 'Accepted':
         return 'success'
@@ -67,6 +107,8 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
         return 'error'
       case 'Runtime Error':
         return 'warning'
+      case 'Pending':
+        return 'processing'
       default:
         return 'default'
     }
@@ -158,7 +200,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
                         <Text strong className="text-sm">{sub.status}</Text>
                         <br />
                         <Text type="secondary" className="text-xs">
-                          {format(new Date(sub.submittedAt), 'MMM d, HH:mm')}
+                          {sub.submittedAt ? format(new Date(sub.submittedAt), 'MMM d, HH:mm') : '-'}
                         </Text>
                       </div>
                     </div>
@@ -205,7 +247,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
               icon={<PlayCircleFilled />}
               style={{ marginTop: 16 }}
             >
-              {isSubmitting ? t('problemDetail.submitting') : t('problemDetail.submit')}
+              {isSubmitting ? (lastSubmission?.status === 'Pending' ? t('messages.judging') : t('problemDetail.submitting')) : t('problemDetail.submit')}
             </Button>
           </Card>
 
@@ -215,7 +257,15 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <Card title={t('problemDetail.testResults')}>
+              <Card title={lastSubmission.status === 'Pending' ? t('messages.judging') : t('problemDetail.testResults')}>
+                {lastSubmission.status === 'Pending' ? (
+                  <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                    <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
+                    <div style={{ marginTop: 16 }}>
+                      <Text type="secondary">{t('messages.judgingDesc')}</Text>
+                    </div>
+                  </div>
+                ) : (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Text strong className="text-sm">{t('history.status')}</Text>
@@ -261,6 +311,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
                     {t('submission.viewDetail')}
                   </Button>
                 </div>
+                )}
               </Card>
             </motion.div>
           )}

@@ -35,6 +35,7 @@ interface AppState {
   
   setSubmissions: (submissions: Submission[]) => void
   addSubmission: (submission: Submission) => void
+  updateSubmission: (id: number, updates: Partial<Submission>) => void
   setSubmissionsLoading: (loading: boolean) => void
   setSubmissionsError: (error: string | null) => void
   
@@ -91,6 +92,11 @@ export const useAppStore = create<AppState>()(
       }),
       addSubmission: (submission) => set((state) => ({
         submissions: [submission, ...state.submissions]
+      })),
+      updateSubmission: (id, updates) => set((state) => ({
+        submissions: state.submissions.map(s => 
+          s.id === id ? { ...s, ...updates } : s
+        )
       })),
       setSubmissionsLoading: (submissionsLoading) => set({ submissionsLoading }),
       setSubmissionsError: (submissionsError) => set({ submissionsError }),

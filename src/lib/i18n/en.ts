@@ -122,6 +122,8 @@ const en: Record<string, string> = {
   'messages.runtimeError': 'Runtime Error. Check your code for errors',
   'messages.wrongAnswer': 'Wrong Answer',
   'messages.testsPassed': 'tests passed',
+  'messages.judging': 'Judging...',
+  'messages.judgingDesc': 'Your code has been submitted and is being judged, please wait...',
 
   // Common
   'common.loading': 'Loading...',

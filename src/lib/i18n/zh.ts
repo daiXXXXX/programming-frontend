@@ -122,6 +122,8 @@ const zh: Record<string, string> = {
   'messages.runtimeError': '运行错误，请检查你的代码',
   'messages.wrongAnswer': '答案错误',
   'messages.testsPassed': '个测试通过',
+  'messages.judging': '评测中...',
+  'messages.judgingDesc': '代码已提交，正在评测中，请稍候...',
 
   // 通用
   'common.loading': '加载中...',

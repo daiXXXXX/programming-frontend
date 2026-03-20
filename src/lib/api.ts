@@ -105,15 +105,36 @@ class ApiClient {
   }
 
   // 提交相关 API（需要登录）
-  async submitCode(data: SubmitCodeRequest) {
+  async submitCode(data: SubmitCodeRequest): Promise<Submission> {
     const userId = getCurrentUserId()
-    return this.request<Submission>('/submissions', {
+    const url = `${this.baseURL}/submissions`
+    const token = getAccessToken()
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+
+    const response = await fetch(url, {
       method: 'POST',
+      headers,
       body: JSON.stringify({
         ...data,
         userId: userId || 1,
       }),
     })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Network error' }))
+      throw new Error(error.error || error.message || `HTTP ${response.status}`)
+    }
+
+    const submission: Submission = await response.json()
+
+    // 202 表示异步评测（Redis 队列模式），submission.status 为 'Pending'
+    // 201 表示同步评测，结果已经在 submission 中
+    return submission
   }
 
   async getSubmission(id: string | number) {
@@ -228,7 +249,7 @@ export const api = new ApiClient(API_BASE_URL)
 
 // 类型定义（与后端保持一致）
 export type DifficultyLevel = 'Easy' | 'Medium' | 'Hard'
-export type SubmissionStatus = 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Time Limit Exceeded'
+export type SubmissionStatus = 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Time Limit Exceeded' | 'Pending'
 
 export interface TestCase {
   id: number
@@ -400,7 +421,7 @@ export interface CreateCommentRequest {
 
 // ==================== WebSocket 消息类型 ====================
 
-export type WSMessageType = 'chat' | 'system_notice' | 'new_comment' | 'new_solution' | 'like_notify' | 'online_count'
+export type WSMessageType = 'chat' | 'system_notice' | 'new_comment' | 'new_solution' | 'like_notify' | 'online_count' | 'judge_result'
 
 export interface WSMessage {
   type: WSMessageType

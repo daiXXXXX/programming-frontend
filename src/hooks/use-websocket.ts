@@ -161,6 +161,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             dispatch(message)
             break
 
+          case 'judge_result':
+            // 评测结果：dispatch 给订阅的组件更新提交状态
+            dispatch(message)
+            break
+
           case 'chat':
             // 聊天消息：dispatch 给订阅的组件
             dispatch(message)

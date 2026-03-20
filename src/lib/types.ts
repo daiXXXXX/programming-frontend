@@ -1,5 +1,5 @@
 export type DifficultyLevel = 'Easy' | 'Medium' | 'Hard'
-export type SubmissionStatus = 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Time Limit Exceeded'
+export type SubmissionStatus = 'Accepted' | 'Wrong Answer' | 'Runtime Error' | 'Time Limit Exceeded' | 'Pending'
 
 export interface TestCase {
   id: string

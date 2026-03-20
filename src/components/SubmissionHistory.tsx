@@ -2,7 +2,7 @@
 
 import { Problem, Submission } from '@/lib/api'
 import { Card, Table, Tag, Button, Empty, Typography } from 'antd'
-import { CheckCircleFilled, CloseCircleFilled, CodeOutlined } from '@ant-design/icons'
+import { CheckCircleFilled, CloseCircleFilled, CodeOutlined, LoadingOutlined } from '@ant-design/icons'
 import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import { useI18n } from '@/hooks/use-i18n'
@@ -37,13 +37,15 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
   }
 
   const sortedSubmissions = [...submissions].sort(
-    (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+    (a, b) => new Date(b.submittedAt || 0).getTime() - new Date(a.submittedAt || 0).getTime()
   )
 
   const getStatusIcon = (status: Submission['status']) => {
     switch (status) {
       case 'Accepted':
         return <CheckCircleFilled style={{ color: '#52c41a' }} />
+      case 'Pending':
+        return <LoadingOutlined style={{ color: '#1677ff' }} spin />
       default:
         return <CloseCircleFilled style={{ color: '#ff4d4f' }} />
     }
@@ -57,6 +59,8 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
         return 'red'
       case 'Runtime Error':
         return 'orange'
+      case 'Pending':
+        return 'processing'
       default:
         return 'default'
     }
@@ -114,7 +118,7 @@ export function SubmissionHistory({ submissions, problems, onViewProblem }: Subm
       dataIndex: 'submittedAt',
       key: 'submittedAt',
       render: (submittedAt: string) => (
-        <Text type="secondary">{format(new Date(submittedAt), 'MMM d, yyyy HH:mm')}</Text>
+        <Text type="secondary">{submittedAt ? format(new Date(submittedAt), 'MMM d, yyyy HH:mm') : '-'}</Text>
       ),
     },
     {

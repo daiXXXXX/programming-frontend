@@ -16,6 +16,7 @@ export function useSubmissions() {
     submissionsLastFetch,
     setSubmissions,
     addSubmission,
+    updateSubmission,
     setSubmissionsLoading,
     setSubmissionsError,
     isCacheValid
@@ -61,8 +62,11 @@ export function useSubmissions() {
       // 添加到本地状态
       addSubmission(submission)
 
-      // 显示结果
-      if (submission.status === 'Accepted') {
+      // 根据状态显示不同的消息
+      if (submission.status === 'Pending') {
+        // 异步评测模式：提示用户等待
+        message.info(t('messages.judging'))
+      } else if (submission.status === 'Accepted') {
         message.success(`✓ ${t('messages.allTestsPassed')} ${t('history.score')}: ${submission.score}%`)
       } else if (submission.status === 'Runtime Error') {
         message.error(`✗ ${t('messages.runtimeError')}`)
@@ -109,6 +113,7 @@ export function useSubmissions() {
     error: submissionsError,
     loadSubmissions,
     submitCode,
+    updateSubmission,
     getSolvedProblemIds,
     getProblemSubmissions,
     refresh: () => loadSubmissions(true)

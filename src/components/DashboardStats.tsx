@@ -47,7 +47,7 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
     const chart = echarts.init(chartRef.current)
     
     const submissionsByDate = submissions.reduce((acc, sub) => {
-      const date = new Date(sub.submittedAt).toLocaleDateString()
+      const date = sub.submittedAt ? new Date(sub.submittedAt).toLocaleDateString() : ''
       acc[date] = (acc[date] || 0) + 1
       return acc
     }, {} as Record<string, number>)
@@ -178,13 +178,13 @@ export function DashboardStats({ problems, submissions, onViewProblem }: Dashboa
     .sort((a, b) => {
       const aLastSubmission = submissions
         .filter(s => s.problemId === a.id && s.status === 'Accepted')
-        .sort((x, y) => new Date(y.submittedAt).getTime() - new Date(x.submittedAt).getTime())[0]
+        .sort((x, y) => new Date(y.submittedAt || 0).getTime() - new Date(x.submittedAt || 0).getTime())[0]
       const bLastSubmission = submissions
         .filter(s => s.problemId === b.id && s.status === 'Accepted')
-        .sort((x, y) => new Date(y.submittedAt).getTime() - new Date(x.submittedAt).getTime())[0]
+        .sort((x, y) => new Date(y.submittedAt || 0).getTime() - new Date(x.submittedAt || 0).getTime())[0]
       
       if (!aLastSubmission || !bLastSubmission) return 0
-      return new Date(bLastSubmission.submittedAt).getTime() - new Date(aLastSubmission.submittedAt).getTime()
+      return new Date(bLastSubmission.submittedAt || 0).getTime() - new Date(aLastSubmission.submittedAt || 0).getTime()
     })
     .slice(0, 5)
 

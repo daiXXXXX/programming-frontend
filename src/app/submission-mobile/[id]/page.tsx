@@ -269,7 +269,7 @@ export default function MobileSubmissionDetailPage() {
             </Text>
             <Text type="secondary">
               <ClockCircleOutlined style={{ marginRight: 4 }} />
-              {format(new Date(submission.submittedAt), 'yyyy-MM-dd HH:mm')}
+              {submission.submittedAt ? format(new Date(submission.submittedAt), 'yyyy-MM-dd HH:mm') : '-'}
             </Text>
           </div>
         </Card>

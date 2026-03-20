@@ -268,7 +268,7 @@ export default function SubmissionDetailPage() {
                 </Descriptions.Item>
                 <Descriptions.Item label={t('history.submittedAt')}>
                   <Text type="secondary">
-                    {format(new Date(submission.submittedAt), 'yyyy-MM-dd HH:mm:ss')}
+                    {submission.submittedAt ? format(new Date(submission.submittedAt), 'yyyy-MM-dd HH:mm:ss') : '-'}
                   </Text>
                 </Descriptions.Item>
               </Descriptions>
