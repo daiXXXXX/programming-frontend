@@ -9,6 +9,9 @@ export interface User {
   id: number
   username: string
   email: string
+  // 班级信息来自 `auth/me`，非学生账号可能为空或为默认值。
+  classId?: number
+  className?: string
   role: UserRole
   avatar: string
   bio: string

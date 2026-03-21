@@ -152,6 +152,10 @@ export default function ProfilePage() {
     )
   }
 
+  // 只有学生账号展示班级信息，避免给教师和管理员显示无意义的空字段。
+  const shouldShowClassInfo = user.role === 'student'
+  const displayClassName = user.className?.trim() || t('profile.classUnassigned')
+
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
       {/* Header Banner */}
@@ -371,6 +375,18 @@ export default function ProfilePage() {
                     placeholder={t('profile.emailPlaceholder')}
                   />
                 </Form.Item>
+
+                {/* 班级信息由后端返回，仅用于学生查看，不允许在个人资料页直接编辑。 */}
+                {shouldShowClassInfo && (
+                  <Form.Item label={t('profile.classInfo')}>
+                    <Input
+                      value={displayClassName}
+                      placeholder={t('profile.classInfoPlaceholder')}
+                      readOnly
+                      disabled
+                    />
+                  </Form.Item>
+                )}
 
                 <Form.Item
                   name="bio"
