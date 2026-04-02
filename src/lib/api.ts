@@ -137,6 +137,17 @@ class ApiClient {
     return submission
   }
 
+  // 样例测试 API（需要登录，但不会写入正式提交历史）
+  async runSampleTests(data: SubmitCodeRequest): Promise<CodeRunResult> {
+    return this.request<CodeRunResult>('/submissions/test', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...data,
+        language: data.language || 'JavaScript',
+      }),
+    })
+  }
+
   async getSubmission(id: string | number) {
     return this.request<Submission>(`/submissions/${id}`)
   }
@@ -297,6 +308,15 @@ export interface Submission {
   score: number
   testResults?: TestResult[]
   submittedAt: string
+}
+
+export interface CodeRunResult {
+  problemId: number
+  language: string
+  status: SubmissionStatus
+  score: number
+  testResults?: TestResult[]
+  ranAt: string
 }
 
 export interface UserStats {

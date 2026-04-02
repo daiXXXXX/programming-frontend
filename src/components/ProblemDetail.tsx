@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Problem, Submission } from '@/lib/api'
-import { Card, Button, Tag, Divider, Typography, Empty, Select, Spin } from 'antd'
+import { api, CodeRunResult, Problem, Submission, TestResult } from '@/lib/api'
+import { Card, Button, Tag, Divider, Typography, Empty, Select, Spin, message } from 'antd'
 import { 
   ArrowLeftOutlined, 
   PlayCircleFilled, 
@@ -34,7 +34,9 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
   const router = useRouter()
   const [code, setCode] = useState('')
   const [language, setLanguage] = useState('JavaScript')
+  const [isTesting, setIsTesting] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [localTestResult, setLocalTestResult] = useState<CodeRunResult | null>(null)
   const [lastSubmission, setLastSubmission] = useState<Submission | null>(null)
   const { on } = useWebSocket()
   const updateSubmission = useAppStore(s => s.updateSubmission)
@@ -66,6 +68,29 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
     return unsubscribe
   }, [on, updateSubmission])
 
+  // 题目切换时清空本地测试和提交结果，避免结果串题。
+  useEffect(() => {
+    setLocalTestResult(null)
+    setLastSubmission(null)
+    setIsTesting(false)
+    setIsSubmitting(false)
+  }, [problem.id])
+
+  const getStatusText = (status: Submission['status']) => {
+    switch (status) {
+      case 'Accepted':
+        return t('status.accepted')
+      case 'Wrong Answer':
+        return t('status.wrongAnswer')
+      case 'Runtime Error':
+        return t('status.runtimeError')
+      case 'Time Limit Exceeded':
+        return t('submission.timeLimitExceeded')
+      default:
+        return t('status.pending')
+    }
+  }
+
   const handleSubmit = async () => {
     setIsSubmitting(true)
     const result = await onSubmit(String(problem.id), code, language)
@@ -81,6 +106,34 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
     }
   }
 
+  const handleRunSampleTests = async () => {
+    if (!code.trim()) {
+      message.error(t('messages.writeCodeFirst'))
+      return
+    }
+
+    try {
+      setIsTesting(true)
+      const result = await api.runSampleTests({
+        problemId: Number(problem.id),
+        code,
+        language,
+      })
+
+      setLocalTestResult(result)
+
+      if (result.status === 'Accepted') {
+        message.success(t('problemDetail.localTestPassed'))
+      } else {
+        message.info(t('problemDetail.localTestFinished'))
+      }
+    } catch (error) {
+      message.error(error instanceof Error ? error.message : t('problemDetail.localTestFailed'))
+    } finally {
+      setIsTesting(false)
+    }
+  }
+
   const recentSubmissions = (submissions || [])
     .sort((a, b) => new Date(b.submittedAt || 0).getTime() - new Date(a.submittedAt || 0).getTime())
     .slice(0, 5)
@@ -92,6 +145,8 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
       case 'Wrong Answer':
       case 'Runtime Error':
         return <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 16 }} />
+      case 'Time Limit Exceeded':
+        return <ClockCircleOutlined style={{ color: '#faad14', fontSize: 16 }} />
       case 'Pending':
         return <LoadingOutlined style={{ color: '#1677ff', fontSize: 16 }} spin />
       default:
@@ -106,6 +161,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
       case 'Wrong Answer':
         return 'error'
       case 'Runtime Error':
+      case 'Time Limit Exceeded':
         return 'warning'
       case 'Pending':
         return 'processing'
@@ -113,6 +169,98 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
         return 'default'
     }
   }
+
+  // renderCaseDetails 统一展示每个测试点的输入、期望输出和运行结果。
+  const renderCaseDetails = (result: TestResult, idx: number) => (
+    <Card key={`${result.testCaseId}-${idx}`} size="small" style={{ backgroundColor: '#fafafa' }}>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {result.passed ? (
+              <CheckCircleFilled style={{ color: '#52c41a', fontSize: 16 }} />
+            ) : (
+              <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 16 }} />
+            )}
+            <Text className="text-sm">{t('problemDetail.testCase')} {idx + 1}</Text>
+          </div>
+          {result.executionTime !== undefined && (
+            <Text type="secondary" className="text-xs">{result.executionTime}ms</Text>
+          )}
+        </div>
+
+        <div>
+          <Text type="secondary" className="text-xs">{t('problemDetail.input')}:</Text>
+          <pre className="text-sm font-mono bg-white p-2 rounded mt-1 whitespace-pre-wrap">{result.input || '-'}</pre>
+        </div>
+
+        <div>
+          <Text type="secondary" className="text-xs">{t('problemDetail.expectedOutput')}:</Text>
+          <pre className="text-sm font-mono bg-white p-2 rounded mt-1 whitespace-pre-wrap">{result.expectedOutput || '-'}</pre>
+        </div>
+
+        <div>
+          <Text type="secondary" className="text-xs">{result.error ? t('problemDetail.errorMessage') : t('problemDetail.yourOutput')}:</Text>
+          <pre className="text-sm font-mono bg-white p-2 rounded mt-1 whitespace-pre-wrap">{result.error || result.actualOutput || '-'}</pre>
+        </div>
+      </div>
+    </Card>
+  )
+
+  // renderResultCard 用于复用本地测试结果卡片和正式提交结果卡片。
+  const renderResultCard = ({
+    title,
+    status,
+    score,
+    testResults,
+    detailSubmissionId,
+  }: {
+    title: string
+    status: Submission['status']
+    score: number
+    testResults?: TestResult[]
+    detailSubmissionId?: number
+  }) => (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card title={title}>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Text strong className="text-sm">{t('history.status')}</Text>
+            <Tag color={getStatusColor(status)}>
+              {getStatusText(status)}
+            </Tag>
+          </div>
+          <div className="flex items-center justify-between">
+            <Text strong className="text-sm">{t('history.score')}</Text>
+            <Text strong className="text-lg">{score}%</Text>
+          </div>
+          <Divider />
+          <div>
+            <Text strong className="text-sm">{t('problemDetail.testCase')}</Text>
+            <div className="space-y-3 mt-2">
+              {testResults?.length ? testResults.map(renderCaseDetails) : <Empty description={t('problemDetail.noTestResults')} />}
+            </div>
+          </div>
+          {detailSubmissionId ? (
+            <>
+              <Divider />
+              <Button 
+                type="primary" 
+                ghost 
+                block
+                onClick={() => router.push(`/submission/${detailSubmissionId}`)}
+              >
+                {t('submission.viewDetail')}
+              </Button>
+            </>
+          ) : null}
+        </div>
+      </Card>
+    </motion.div>
+  )
 
   return (
     <div className="space-y-6">
@@ -197,7 +345,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
                     <div className="flex items-center gap-3">
                       {getStatusIcon(sub.status)}
                       <div>
-                        <Text strong className="text-sm">{sub.status}</Text>
+                        <Text strong className="text-sm">{getStatusText(sub.status)}</Text>
                         <br />
                         <Text type="secondary" className="text-xs">
                           {sub.submittedAt ? format(new Date(sub.submittedAt), 'MMM d, HH:mm') : '-'}
@@ -238,82 +386,63 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
                 ]}
               />
             </div>
-            <Button
-              type="primary"
-              onClick={handleSubmit}
-              disabled={isSubmitting || !code.trim()}
-              block
-              size="large"
-              icon={<PlayCircleFilled />}
-              style={{ marginTop: 16 }}
-            >
-              {isSubmitting ? (lastSubmission?.status === 'Pending' ? t('messages.judging') : t('problemDetail.submitting')) : t('problemDetail.submit')}
-            </Button>
+            <Text type="secondary" className="text-xs">
+              {t('problemDetail.localTestHint')}
+            </Text>
+            <div className="flex gap-3" style={{ marginTop: 16 }}>
+              <Button
+                onClick={handleRunSampleTests}
+                loading={isTesting}
+                disabled={isSubmitting || !code.trim()}
+                size="large"
+                icon={<PlayCircleFilled />}
+                style={{ flex: 1 }}
+              >
+                {isTesting ? t('problemDetail.localTesting') : t('problemDetail.localTest')}
+              </Button>
+              <Button
+                type="primary"
+                onClick={handleSubmit}
+                disabled={isSubmitting || isTesting || !code.trim()}
+                size="large"
+                icon={<PlayCircleFilled />}
+                style={{ flex: 1 }}
+              >
+                {isSubmitting ? (lastSubmission?.status === 'Pending' ? t('messages.judging') : t('problemDetail.submitting')) : t('problemDetail.submit')}
+              </Button>
+            </div>
           </Card>
 
+          {localTestResult && renderResultCard({
+            title: t('problemDetail.localTestResults'),
+            status: localTestResult.status,
+            score: localTestResult.score,
+            testResults: localTestResult.testResults,
+          })}
+
           {lastSubmission && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card title={lastSubmission.status === 'Pending' ? t('messages.judging') : t('problemDetail.testResults')}>
-                {lastSubmission.status === 'Pending' ? (
+            lastSubmission.status === 'Pending' ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card title={t('messages.judging')}>
                   <div style={{ textAlign: 'center', padding: '32px 0' }}>
                     <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
                     <div style={{ marginTop: 16 }}>
                       <Text type="secondary">{t('messages.judgingDesc')}</Text>
                     </div>
                   </div>
-                ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Text strong className="text-sm">{t('history.status')}</Text>
-                    <Tag color={getStatusColor(lastSubmission.status)}>
-                      {lastSubmission.status}
-                    </Tag>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Text strong className="text-sm">{t('history.score')}</Text>
-                    <Text strong className="text-lg">{lastSubmission.score}%</Text>
-                  </div>
-                  <Divider />
-                  <div>
-                    <Text strong className="text-sm">{t('problemDetail.testCase')}</Text>
-                    <div className="space-y-2 mt-2">
-                      {lastSubmission.testResults?.map((result, idx) => (
-                        <div 
-                          key={result.testCaseId}
-                          className="flex items-center justify-between p-2 rounded bg-gray-50"
-                        >
-                          <div className="flex items-center gap-2">
-                            {result.passed ? (
-                              <CheckCircleFilled style={{ color: '#52c41a', fontSize: 16 }} />
-                            ) : (
-                              <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: 16 }} />
-                            )}
-                            <Text className="text-sm">{t('problemDetail.testCase')} {idx + 1}</Text>
-                          </div>
-                          {result.executionTime !== undefined && (
-                            <Text type="secondary" className="text-xs">{result.executionTime}ms</Text>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <Divider />
-                  <Button 
-                    type="primary" 
-                    ghost 
-                    block
-                    onClick={() => router.push(`/submission/${lastSubmission.id}`)}
-                  >
-                    {t('submission.viewDetail')}
-                  </Button>
-                </div>
-                )}
-              </Card>
-            </motion.div>
+                </Card>
+              </motion.div>
+            ) : renderResultCard({
+              title: t('problemDetail.testResults'),
+              status: lastSubmission.status,
+              score: lastSubmission.score,
+              testResults: lastSubmission.testResults,
+              detailSubmissionId: lastSubmission.id,
+            })
           )}
         </div>
       </div>
