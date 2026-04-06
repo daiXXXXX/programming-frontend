@@ -91,6 +91,14 @@ class ApiClient {
     })
   }
 
+  // 录题前校验标准程序，确保当前测试数据可被完整通过。
+  async validateProblemDraft(data: ValidateProblemRequest) {
+    return this.request<ProblemValidationResponse>('/problems/validate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
   async updateProblem(id: string | number, data: CreateProblemRequest) {
     return this.request<Problem>(`/problems/${id}`, {
       method: 'PUT',
@@ -267,6 +275,7 @@ export interface TestCase {
   input: string
   expectedOutput: string
   description?: string
+  isSample?: boolean
 }
 
 export interface Problem {
@@ -349,6 +358,27 @@ export interface CreateProblemRequest {
     isSample?: boolean
   }[]
   tags: string[]
+  standardProgram?: ProblemStandardProgram
+}
+
+export interface ProblemStandardProgram {
+  language: 'JavaScript' | 'C'
+  code: string
+}
+
+export interface ValidateProblemRequest {
+  testCases: {
+    input: string
+    expectedOutput: string
+    description?: string
+    isSample?: boolean
+  }[]
+  standardProgram: ProblemStandardProgram
+}
+
+export interface ProblemValidationResponse {
+  ready: boolean
+  result: CodeRunResult
 }
 
 export interface SubmitCodeRequest {

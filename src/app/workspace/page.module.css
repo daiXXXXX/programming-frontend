@@ -87,6 +87,22 @@
   gap: 0.5rem;
 }
 
+/* 题目工具栏左侧需要同时容纳标题、搜索框和录题入口。 */
+.problemToolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* 搜索框和“我要出题”按钮保持同一视觉分组，满足新需求的交互位置。 */
+.problemSearchActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .animated {
   animation: fadeIn 0.3s ease-out;
 }

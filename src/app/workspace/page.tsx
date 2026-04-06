@@ -8,7 +8,7 @@ import {
   List,
   Trophy,
 } from '@phosphor-icons/react'
-import { UserOutlined, LogoutOutlined, LoginOutlined, EditOutlined, SettingOutlined } from '@ant-design/icons'
+import { UserOutlined, LogoutOutlined, LoginOutlined, EditOutlined, SettingOutlined, PlusOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ProblemList } from '@/components/ProblemList'
@@ -101,24 +101,33 @@ export default function WorkspacePage() {
       children: !selectedProblem ? (
         <>
           <div className="flex items-center justify-between mb-6">
-            <Space>
+            <div className={styles.problemToolbarLeft}>
               <Title level={3} style={{ margin: 0 }}>{t('problems.title')}</Title>
-              <Input.Search
-                placeholder={t('problems.searchPlaceholder')}
-                allowClear
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                onSearch={(value) => {
-                  if (value.trim()) {
-                    searchProblems(value.trim())
-                  } else {
-                    refreshProblems()
-                  }
-                }}
-                onClear={() => refreshProblems()}
-                style={{ width: 240 }}
-              />
-            </Space>
+              <div className={styles.problemSearchActions}>
+                <Input.Search
+                  placeholder={t('problems.searchPlaceholder')}
+                  allowClear
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  onSearch={(value) => {
+                    if (value.trim()) {
+                      searchProblems(value.trim())
+                    } else {
+                      refreshProblems()
+                    }
+                  }}
+                  onClear={() => refreshProblems()}
+                  style={{ width: 240 }}
+                />
+                {(user?.role === 'instructor' || user?.role === 'admin') && (
+                  <Link href="/workspace/createProblem">
+                    <Button type="primary" icon={<PlusOutlined />}>
+                      我要出题
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
             <Space>
               {(['All', 'Easy', 'Medium', 'Hard'] as const).map(level => (
                 <Button

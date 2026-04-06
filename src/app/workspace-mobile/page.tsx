@@ -18,6 +18,7 @@ import { MobileLayout } from '@/components/MobileLayout'
 import { useI18n, useProblems, useSubmissions, useUIState, useAuth } from '@/hooks'
 import { useMobileRedirect } from '@/hooks/use-mobile'
 import { Submission } from '@/lib/api'
+import Link from 'next/link'
 
 const { Title, Text } = Typography
 
@@ -152,6 +153,15 @@ export default function MobileWorkspacePage() {
               onClear={() => refreshProblems()}
               style={{ width: '100%', marginBottom: 8 }}
             />
+            {(user?.role === 'instructor' || user?.role === 'admin') && (
+              <div style={{ marginBottom: 8 }}>
+                <Link href="/workspace/createProblem">
+                  <Button type="primary" block>
+                    我要出题
+                  </Button>
+                </Link>
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               {(['All', 'Easy', 'Medium', 'Hard'] as const).map(level => (
                 <Tag
