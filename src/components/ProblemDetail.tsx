@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { api, CodeRunResult, Problem, Submission, TestResult } from '@/lib/api'
-import { Card, Button, Tag, Divider, Typography, Empty, Select, Spin, message } from 'antd'
+import { Card, Button, Tag, Divider, Typography, Empty, Select, Spin, message, Alert } from 'antd'
 import { 
   ArrowLeftOutlined, 
   PlayCircleFilled, 
@@ -13,8 +13,10 @@ import {
   LoadingOutlined,
 } from '@ant-design/icons'
 import { format } from 'date-fns'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { useAuth } from '@/hooks/use-auth'
 import { useI18n } from '@/hooks/use-i18n'
 import { CodeEditor } from '@/components/CodeEditor'
 import { useWebSocket } from '@/hooks/use-websocket'
@@ -32,6 +34,8 @@ interface ProblemDetailProps {
 export function ProblemDetail({ problem, submissions, onBack, onSubmit }: ProblemDetailProps) {
   const { t } = useI18n()
   const router = useRouter()
+  const pathname = usePathname()
+  const { isAuthenticated } = useAuth()
   const [code, setCode] = useState('')
   const [language, setLanguage] = useState('JavaScript')
   const [isTesting, setIsTesting] = useState(false)
@@ -40,6 +44,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
   const [lastSubmission, setLastSubmission] = useState<Submission | null>(null)
   const { on } = useWebSocket()
   const updateSubmission = useAppStore(s => s.updateSubmission)
+  const loginPath = pathname?.includes('-mobile') ? '/login-mobile' : '/login'
 
   // 监听 WebSocket 评测结果
   useEffect(() => {
@@ -92,6 +97,13 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
   }
 
   const handleSubmit = async () => {
+    // 游客允许看题，但正式评测必须登录后才能发起。
+    if (!isAuthenticated) {
+      message.warning(t('problemDetail.loginToSubmit'))
+      router.push(loginPath)
+      return
+    }
+
     setIsSubmitting(true)
     const result = await onSubmit(String(problem.id), code, language)
     if (result) {
@@ -371,6 +383,24 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
               height="400px"
               placeholder={t('problemDetail.writeCodeHere')}
             />
+            {!isAuthenticated && (
+              <Alert
+                showIcon
+                type="info"
+                style={{ marginTop: 16 }}
+                message={t('problemDetail.guestModeTitle')}
+                description={
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <span>{t('problemDetail.loginToSubmit')}</span>
+                    <Link href={loginPath}>
+                      <Button size="small" type="link" style={{ paddingInline: 0 }}>
+                        {t('common.login')}
+                      </Button>
+                    </Link>
+                  </div>
+                }
+              />
+            )}
             <div style={{ marginTop: 12, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Text type="secondary" className="text-xs">
                 {t('problemDetail.language')}：
@@ -393,7 +423,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
               <Button
                 onClick={handleRunSampleTests}
                 loading={isTesting}
-                disabled={isSubmitting || !code.trim()}
+                disabled={!isAuthenticated || isSubmitting || !code.trim()}
                 size="large"
                 icon={<PlayCircleFilled />}
                 style={{ flex: 1 }}
@@ -403,7 +433,7 @@ export function ProblemDetail({ problem, submissions, onBack, onSubmit }: Proble
               <Button
                 type="primary"
                 onClick={handleSubmit}
-                disabled={isSubmitting || isTesting || !code.trim()}
+                disabled={!isAuthenticated || isSubmitting || isTesting || !code.trim()}
                 size="large"
                 icon={<PlayCircleFilled />}
                 style={{ flex: 1 }}

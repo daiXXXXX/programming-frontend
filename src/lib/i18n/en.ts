@@ -90,6 +90,8 @@ const en: Record<string, string> = {
   'problemDetail.localTestPassed': 'All sample tests passed',
   'problemDetail.localTestFinished': 'Sample testing finished. Review the result details below.',
   'problemDetail.localTestFailed': 'Sample testing failed',
+  'problemDetail.guestModeTitle': 'Guest Mode',
+  'problemDetail.loginToSubmit': 'Guests can browse problems, but testing and code submission require login.',
   'problemDetail.testResults': 'Test Results',
   'problemDetail.testCase': 'Test Case',
   'problemDetail.passed': 'Passed',

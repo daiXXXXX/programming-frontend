@@ -6,27 +6,39 @@ import { api, Submission, SubmitCodeRequest } from '@/lib/api'
 import { useAppStore } from '@/store/appStore'
 import { message } from 'antd'
 import { useI18n } from './use-i18n'
+import { useAuthStore } from '@/store/authStore'
 
 export function useSubmissions() {
   const { t } = useI18n()
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const {
     submissions,
     submissionsLoading,
     submissionsError,
-    submissionsLastFetch,
     setSubmissions,
+    resetSubmissionsCache,
     addSubmission,
     updateSubmission,
     setSubmissionsLoading,
     setSubmissionsError,
-    isCacheValid
   } = useAppStore()
 
   // 加载提交记录
   const loadSubmissions = useCallback(async (forceRefresh = false) => {
+    // 游客访问工作台时只展示题目，不请求任何个人提交数据。
+    if (!isAuthenticated) {
+      return []
+    }
+
+    const {
+      submissions: cachedSubmissions,
+      submissionsLastFetch,
+      isCacheValid,
+    } = useAppStore.getState()
+
     // 如果缓存有效且不强制刷新，直接返回
-    if (!forceRefresh && isCacheValid(submissionsLastFetch) && submissions.length > 0) {
-      return submissions
+    if (!forceRefresh && isCacheValid(submissionsLastFetch) && cachedSubmissions.length > 0) {
+      return cachedSubmissions
     }
 
     try {
@@ -43,12 +55,18 @@ export function useSubmissions() {
     } finally {
       setSubmissionsLoading(false)
     }
-  }, [submissions, submissionsLastFetch, setSubmissions, setSubmissionsLoading, setSubmissionsError, isCacheValid])
+  }, [isAuthenticated, setSubmissions, setSubmissionsLoading, setSubmissionsError])
 
   // 提交代码
   const submitCode = useCallback(async (data: SubmitCodeRequest): Promise<Submission | null> => {
     if (!data.code?.trim()) {
       message.error(t('messages.writeCodeFirst'))
+      return null
+    }
+
+    // 前端先拦截游客提交，避免进入需要登录的评测接口。
+    if (!isAuthenticated) {
+      message.warning(t('problemDetail.loginToSubmit'))
       return null
     }
 
@@ -84,7 +102,7 @@ export function useSubmissions() {
     } finally {
       setSubmissionsLoading(false)
     }
-  }, [t, addSubmission, setSubmissionsLoading])
+  }, [isAuthenticated, t, addSubmission, setSubmissionsLoading])
 
   // 获取已解决的题目ID集合
   const getSolvedProblemIds = useCallback((): Set<number> => {
@@ -100,12 +118,24 @@ export function useSubmissions() {
     return (submissions || []).filter(s => s.problemId === problemId)
   }, [submissions])
 
-  // 初始加载
+  // 游客态只清空个人提交缓存，不参与后续请求流程。
   useEffect(() => {
-    if (submissions.length === 0 && !submissionsLoading) {
-      loadSubmissions()
+    if (!isAuthenticated) {
+      // 登录态丢失时立即清空缓存中的个人提交，避免游客看到旧数据。
+      resetSubmissionsCache()
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, resetSubmissionsCache])
+
+  // 已登录时再拉取个人提交记录，避免游客态与请求逻辑互相触发。
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return
+    }
+
+    if (submissions.length === 0 && !submissionsLoading) {
+      void loadSubmissions()
+    }
+  }, [isAuthenticated, submissions.length, submissionsLoading, loadSubmissions])
 
   return {
     submissions,

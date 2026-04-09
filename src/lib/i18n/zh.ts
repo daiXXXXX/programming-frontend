@@ -90,6 +90,8 @@ const zh: Record<string, string> = {
   'problemDetail.localTestPassed': '样例测试全部通过',
   'problemDetail.localTestFinished': '样例测试已完成，请查看结果详情',
   'problemDetail.localTestFailed': '样例测试失败',
+  'problemDetail.guestModeTitle': '游客模式',
+  'problemDetail.loginToSubmit': '未登录时可以浏览题目，但需要登录后才能运行测试和提交代码。',
   'problemDetail.testResults': '测试结果',
   'problemDetail.testCase': '测试用例',
   'problemDetail.passed': '通过',

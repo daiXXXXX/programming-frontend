@@ -34,6 +34,7 @@ interface AppState {
   setProblemsError: (error: string | null) => void
   
   setSubmissions: (submissions: Submission[]) => void
+  resetSubmissionsCache: () => void
   addSubmission: (submission: Submission) => void
   updateSubmission: (id: number, updates: Partial<Submission>) => void
   setSubmissionsLoading: (loading: boolean) => void
@@ -56,7 +57,7 @@ const DEFAULT_CACHE_MAX_AGE = 5 * 60 * 1000
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // 初始状态
       problems: [],
       problemsLoading: false,
@@ -89,6 +90,25 @@ export const useAppStore = create<AppState>()(
         submissions,
         submissionsLastFetch: Date.now(),
         submissionsError: null
+      }),
+      // resetSubmissionsCache 用于退出登录或游客访问时清空个人提交态，避免刷新缓存时间戳导致循环更新。
+      resetSubmissionsCache: () => set((state) => {
+        // 已经是游客态空缓存时直接复用旧状态，避免无意义更新导致组件重复渲染。
+        if (
+          state.submissions.length === 0 &&
+          !state.submissionsLoading &&
+          state.submissionsError === null &&
+          state.submissionsLastFetch === null
+        ) {
+          return state
+        }
+
+        return {
+          submissions: [],
+          submissionsLoading: false,
+          submissionsError: null,
+          submissionsLastFetch: null,
+        }
       }),
       addSubmission: (submission) => set((state) => ({
         submissions: [submission, ...state.submissions]
