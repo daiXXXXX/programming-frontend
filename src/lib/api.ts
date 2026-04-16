@@ -194,6 +194,32 @@ class ApiClient {
     return this.request<DailyActivity[]>(`/stats/user/${uid}/activity${query}`)
   }
 
+  // ==================== 后台管理：班级/查重 API ====================
+
+  async getManagerClasses(keyword?: string, isAdmin?: boolean) {
+	const query = keyword ? `?search=${encodeURIComponent(keyword)}` : ''
+	const endpoint = isAdmin ? `/manager/classes${query}` : `/manager/my-classes${query}`
+	return this.request<ClassInfo[]>(endpoint)
+  }
+
+  async getManagerClassDetail(classId: number) {
+	return this.request<ClassDetailData>(`/manager/classes/${classId}`)
+  }
+
+  async runClassPlagiarismCheck(classId: number, data: PlagiarismCheckRequest) {
+	return this.request<PlagiarismCheckResponse>(`/manager/classes/${classId}/plagiarism-check`, {
+	  method: 'POST',
+	  body: JSON.stringify(data),
+	})
+  }
+
+  async markClassPlagiarismPair(classId: number, data: PlagiarismMarkRequest) {
+	return this.request<PlagiarismMarkResponse>(`/manager/classes/${classId}/plagiarism-marks`, {
+	  method: 'POST',
+	  body: JSON.stringify(data),
+	})
+  }
+
   // ==================== 题解相关 API ====================
 
   // 获取题目的题解列表
@@ -315,8 +341,122 @@ export interface Submission {
   language: string
   status: SubmissionStatus
   score: number
+  tags?: string[]
   testResults?: TestResult[]
   submittedAt: string
+}
+
+export interface ClassInfo {
+  id: number
+  name: string
+  description: string
+  teacherId: number
+  teacherName: string
+  studentCount: number
+  experimentCount: number
+  createdAt: string
+}
+
+export interface ExperimentInfo {
+  id: number
+  title: string
+  description: string
+  startTime: string
+  endTime: string
+  isActive: boolean
+  problemCount: number
+}
+
+export interface StudentProgress {
+  userId: number
+  username: string
+  avatar: string
+  totalProblems: number
+  solvedProblems: number
+  totalSubmissions: number
+  acceptedSubmissions: number
+  lastSubmissionAt: string | null
+}
+
+export interface ClassProblemInfo {
+  id: number
+  title: string
+  difficulty: DifficultyLevel
+  experimentCount: number
+}
+
+export interface ClassDetailData {
+  classInfo: ClassInfo
+  experiments: ExperimentInfo[]
+  problems: ClassProblemInfo[]
+  students: StudentProgress[]
+}
+
+export interface PlagiarismCheckRequest {
+  problemId: number
+  acceptedOnly: boolean
+  maxCandidates: number
+  minHeuristicScore: number
+}
+
+export interface PlagiarismStudent {
+  userId: number
+  username: string
+  avatar: string
+}
+
+export interface PlagiarismSubmissionRef {
+  id: number
+  language: string
+  status: SubmissionStatus
+  score: number
+  submittedAt: string
+  selection: string
+  tags: string[]
+  markedCheating: boolean
+}
+
+export interface PlagiarismPairResult {
+  pairKey: string
+  studentA: PlagiarismStudent
+  studentB: PlagiarismStudent
+  submissionA: PlagiarismSubmissionRef
+  submissionB: PlagiarismSubmissionRef
+  heuristicScore: number
+  aiConfidence: number
+  riskLevel: string
+  verdict: string
+  summary: string
+  evidence: string[]
+  differences: string[]
+  alreadyMarked: boolean
+}
+
+export interface PlagiarismCheckResponse {
+  classId: number
+  problemId: number
+  problemTitle: string
+  acceptedOnly: boolean
+  comparedStudents: number
+  candidatePairs: number
+  overallSummary: string
+  results: PlagiarismPairResult[]
+}
+
+export interface PlagiarismMarkRequest {
+  problemId: number
+  submissionAId: number
+  submissionBId: number
+}
+
+export interface PlagiarismMarkResponse {
+  classId: number
+  problemId: number
+  pairKey: string
+  tag: string
+  message: string
+  submissionA: PlagiarismSubmissionRef
+  submissionB: PlagiarismSubmissionRef
 }
 
 export interface CodeRunResult {
