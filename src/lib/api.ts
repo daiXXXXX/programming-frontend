@@ -392,11 +392,11 @@ export interface ClassDetailData {
   students: StudentProgress[]
 }
 
+// 启发式阈值已在后端固定为 0.55，前端不再传递
 export interface PlagiarismCheckRequest {
   problemId: number
   acceptedOnly: boolean
   maxCandidates: number
-  minHeuristicScore: number
 }
 
 export interface PlagiarismStudent {
@@ -423,7 +423,6 @@ export interface PlagiarismPairResult {
   submissionA: PlagiarismSubmissionRef
   submissionB: PlagiarismSubmissionRef
   heuristicScore: number
-  aiConfidence: number
   riskLevel: string
   verdict: string
   summary: string

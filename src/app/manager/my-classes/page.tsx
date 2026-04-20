@@ -52,11 +52,11 @@ import type { ColumnsType } from 'antd/es/table'
 const { Title, Text } = Typography
 const { Search } = Input
 
+// 启发式阈值已在后端固定为 0.55，前端不再暴露给用户调整
 const DEFAULT_PLAGIARISM_FORM = {
   problemId: undefined as number | undefined,
   acceptedOnly: false,
   maxCandidates: 5,
-  minHeuristicScore: 0.55,
 }
 
 function getRiskColor(riskLevel: string): string {
@@ -191,7 +191,6 @@ export default function MyClassesPage() {
         problemId: plagiarismForm.problemId,
         acceptedOnly: plagiarismForm.acceptedOnly,
         maxCandidates: plagiarismForm.maxCandidates,
-        minHeuristicScore: plagiarismForm.minHeuristicScore,
       })
       setPlagiarismReport(report)
       message.success(t('manager.plagiarismRunSuccess'))
@@ -218,7 +217,7 @@ export default function MyClassesPage() {
         try {
           setMarkingPairKey(pair.pairKey)
           const result = await api.markClassPlagiarismPair(selectedClassId, {
-            problemId: plagiarismForm.problemId,
+            problemId: plagiarismForm.problemId!,
             submissionAId: pair.submissionA.id,
             submissionBId: pair.submissionB.id,
           })
@@ -565,20 +564,6 @@ export default function MyClassesPage() {
                                   }))}
                                 />
                               </Col>
-                              <Col xs={24} sm={12} md={5}>
-                                <Text strong>{t('manager.plagiarismThreshold')}</Text>
-                                <InputNumber
-                                  min={0.1}
-                                  max={0.95}
-                                  step={0.05}
-                                  style={{ width: '100%', marginTop: 8 }}
-                                  value={plagiarismForm.minHeuristicScore}
-                                  onChange={(value) => setPlagiarismForm((prev) => ({
-                                    ...prev,
-                                    minHeuristicScore: Number(value) || DEFAULT_PLAGIARISM_FORM.minHeuristicScore,
-                                  }))}
-                                />
-                              </Col>
                               <Col xs={24} md={4}>
                                 <Text strong>{t('manager.plagiarismAcceptedOnly')}</Text>
                                 <div style={{ marginTop: 14 }}>
@@ -647,7 +632,6 @@ export default function MyClassesPage() {
                                                 <Tag color={getVerdictColor(pair.verdict)}>{pair.verdict}</Tag>
                                                 <Tag color={getRiskColor(pair.riskLevel)}>{pair.riskLevel}</Tag>
                                                 <Tag>{t('manager.plagiarismHeuristicScore')}: {formatSimilarity(pair.heuristicScore)}</Tag>
-                                                <Tag>{t('manager.plagiarismAIConfidence')}: {formatSimilarity(pair.aiConfidence)}</Tag>
                                                 {pair.alreadyMarked && (
                                                   <Tag color="red">{t('manager.plagiarismAlreadyMarked')}</Tag>
                                                 )}

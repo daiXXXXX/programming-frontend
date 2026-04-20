@@ -36,8 +36,8 @@ export function useSubmissions() {
       isCacheValid,
     } = useAppStore.getState()
 
-    // 如果缓存有效且不强制刷新，直接返回
-    if (!forceRefresh && isCacheValid(submissionsLastFetch) && cachedSubmissions.length > 0) {
+    // 如果缓存有效且不强制刷新，直接返回（即使缓存为空数组也视为有效，避免无提交用户死循环请求）
+    if (!forceRefresh && isCacheValid(submissionsLastFetch)) {
       return cachedSubmissions
     }
 
@@ -127,15 +127,18 @@ export function useSubmissions() {
   }, [isAuthenticated, resetSubmissionsCache])
 
   // 已登录时再拉取个人提交记录，避免游客态与请求逻辑互相触发。
+  // 使用 submissionsLastFetch 判断是否已加载过，而非 submissions.length，
+  // 防止无提交记录的用户（空数组）触发无限请求循环。
+  const submissionsLastFetch = useAppStore((state) => state.submissionsLastFetch)
   useEffect(() => {
     if (!isAuthenticated) {
       return
     }
 
-    if (submissions.length === 0 && !submissionsLoading) {
+    if (!submissionsLastFetch && !submissionsLoading) {
       void loadSubmissions()
     }
-  }, [isAuthenticated, submissions.length, submissionsLoading, loadSubmissions])
+  }, [isAuthenticated, submissionsLastFetch, submissionsLoading, loadSubmissions])
 
   return {
     submissions,
