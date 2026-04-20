@@ -354,7 +354,7 @@ export default function MobileProfilePage() {
             size="large"
             onClick={() => {
               logout()
-              router.push('/home-mobile')
+              // logout hook 已处理跳转到登录页，无需额外跳转
             }}
             style={{ borderRadius: 8 }}
           >

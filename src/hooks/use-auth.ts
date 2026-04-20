@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { message } from 'antd'
 import { useAuthStore, User, UserRole } from '@/store/authStore'
 import { useAppStore } from '@/store/appStore'
@@ -26,6 +27,7 @@ export function useAuth() {
   } = useAuthStore()
 
   const clearAppCache = useAppStore((state) => state.clearCache)
+  const router = useRouter()
 
   const [initialized, setInitialized] = useState(false)
 
@@ -100,12 +102,14 @@ export function useAuth() {
     }
   }, [setAuth, setLoading, setError])
 
-  // 登出
+  // 登出：清除状态并跳转到登录页
   const logout = useCallback(() => {
     storeLogout()
     clearAppCache()
     message.success('已退出登录')
-  }, [storeLogout, clearAppCache])
+    // 退出登录后跳转到登录页
+    router.push('/login')
+  }, [storeLogout, clearAppCache, router])
 
   // 修改密码
   const changePassword = useCallback(async (data: ChangePasswordRequest) => {

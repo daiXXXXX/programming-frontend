@@ -45,6 +45,11 @@ export default function SolutionsPage() {
   const [createContent, setCreateContent] = useState('')
   const [creating, setCreating] = useState(false)
 
+  // 题解区只从题目详情页进入，这里显式回到工作台，避免 `router.back()` 落回到非题目页。
+  const handleBackToProblem = useCallback(() => {
+    router.push('/workspace')
+  }, [router])
+
   const loadSolutions = useCallback(async () => {
     setLoading(true)
     try {
@@ -128,7 +133,7 @@ export default function SolutionsPage() {
         {/* 头部 */}
         <div className="flex items-center justify-between mb-6">
           <Space>
-            <Button icon={<ArrowLeftOutlined />} onClick={() => router.back()}>
+            <Button icon={<ArrowLeftOutlined />} onClick={handleBackToProblem}>
               {t('common.back')}
             </Button>
             <div>
