@@ -68,6 +68,10 @@ const zh: Record<string, string> = {
   'problems.viewProblem': '查看题目',
   'problems.noProblems': '暂无题目',
   'problems.searchPlaceholder': '搜索题目名称...',
+  'problems.dailyTitle': '每日一题',
+  'problems.dailyMatchedTags': '与你最近通过的标签相似：',
+  'problems.dailyMatchedDifficulty': '难度接近你最近通过的题目',
+  'problems.dailyColdStart': '今天先从这道未通过题开始',
 
   // 题目详情
   'problemDetail.backToList': '返回列表',

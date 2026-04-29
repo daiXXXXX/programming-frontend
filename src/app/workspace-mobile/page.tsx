@@ -1,32 +1,31 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { Tabs, Button, Spin, Typography, Tag, Input, Empty, Card, Drawer } from 'antd'
+import { useState } from 'react'
+import { Tabs, Button, Spin, Typography, Tag, Input } from 'antd'
 import { 
   Code, 
   ChartBar, 
   List,
   CaretLeft,
 } from '@phosphor-icons/react'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ProblemList } from '@/components/ProblemList'
 import { ProblemDetail } from '@/components/ProblemDetail'
 import { SubmissionHistory } from '@/components/SubmissionHistory'
 import { DashboardStats } from '@/components/DashboardStats'
 import { MobileLayout } from '@/components/MobileLayout'
-import { useI18n, useProblems, useSubmissions, useUIState, useAuth } from '@/hooks'
+import { useDailyProblemRecommendation, useI18n, useProblems, useSubmissions, useUIState, useAuth } from '@/hooks'
 import { useMobileRedirect } from '@/hooks/use-mobile'
 import { Submission } from '@/lib/api'
 import Link from 'next/link'
 
-const { Title, Text } = Typography
+const { Text } = Typography
 
 export default function MobileWorkspacePage() {
   const { t } = useI18n()
-  const router = useRouter()
   useMobileRedirect()
   const { problems, loading: problemsLoading, searchProblems, refresh: refreshProblems } = useProblems()
+  const { recommendation: dailyRecommendation, loading: dailyRecommendationLoading } = useDailyProblemRecommendation()
   const [searchKeyword, setSearchKeyword] = useState('')
   const { submissions, loading: submissionsLoading, submitCode, getSolvedProblemIds, getProblemSubmissions } = useSubmissions()
   const { user, isAuthenticated } = useAuth()
@@ -44,6 +43,10 @@ export default function MobileWorkspacePage() {
   const selectedProblem = getSelectedProblem()
   const filteredProblems = getFilteredProblems()
   const solvedProblems = getSolvedProblemIds()
+  // selectProblem 只保存题目 ID，移动端同样只展示当前题目缓存中可打开的推荐。
+  const visibleDailyRecommendation = dailyRecommendation?.problem && problems.some(problem => problem.id === dailyRecommendation.problem?.id)
+    ? dailyRecommendation
+    : null
   const loading = problemsLoading || submissionsLoading
 
   const handleSubmitCode = async (problemId: string, code: string, language: string = 'JavaScript'): Promise<Submission | undefined> => {
@@ -183,6 +186,8 @@ export default function MobileWorkspacePage() {
           <ProblemList
             problems={filteredProblems}
             solvedProblems={solvedProblems}
+            dailyRecommendation={visibleDailyRecommendation}
+            dailyRecommendationLoading={isAuthenticated && dailyRecommendationLoading}
             onSelectProblem={selectProblem}
           />
         </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { Tabs, Button, Space, Spin, Typography, Dropdown, Avatar, Input } from 'antd'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   Code, 
   ChartBar, 
@@ -17,7 +17,7 @@ import { SubmissionHistory } from '@/components/SubmissionHistory'
 import { DashboardStats } from '@/components/DashboardStats'
 import { motion } from 'framer-motion'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import { useI18n, useProblems, useSubmissions, useUIState, useAuth, getRoleLabel, useUserStats } from '@/hooks'
+import { useDailyProblemRecommendation, useI18n, useProblems, useSubmissions, useUIState, useAuth, getRoleLabel, useUserStats } from '@/hooks'
 import { useMobileRedirect } from '@/hooks/use-mobile'
 import { Submission } from '@/lib/api'
 import styles from './page.module.css'
@@ -29,6 +29,7 @@ export default function WorkspacePage() {
   const router = useRouter()
   useMobileRedirect()
   const { problems, loading: problemsLoading, searchProblems, refresh: refreshProblems } = useProblems()
+  const { recommendation: dailyRecommendation, loading: dailyRecommendationLoading } = useDailyProblemRecommendation()
   const [searchKeyword, setSearchKeyword] = useState('')
   const { submissions, loading: submissionsLoading, submitCode, getSolvedProblemIds, getProblemSubmissions } = useSubmissions()
   const { userStats, loadUserStats } = useUserStats()
@@ -47,6 +48,10 @@ export default function WorkspacePage() {
   const selectedProblem = getSelectedProblem()
   const filteredProblems = getFilteredProblems()
   const solvedProblems = getSolvedProblemIds()
+  // selectProblem 只记录题目 ID，因此每日一题必须存在于当前题目缓存中才能直接进入详情。
+  const visibleDailyRecommendation = dailyRecommendation?.problem && problems.some(problem => problem.id === dailyRecommendation.problem?.id)
+    ? dailyRecommendation
+    : null
   // 优先使用后端汇总统计，避免最近 100 条提交的本地缓存与排行榜口径不一致。
   const solvedCount = userStats?.totalSolved ?? solvedProblems.size
   const loading = problemsLoading || submissionsLoading
@@ -156,6 +161,8 @@ export default function WorkspacePage() {
           <ProblemList
             problems={filteredProblems}
             solvedProblems={solvedProblems}
+            dailyRecommendation={visibleDailyRecommendation}
+            dailyRecommendationLoading={isAuthenticated && dailyRecommendationLoading}
             onSelectProblem={selectProblem}
           />
         </>

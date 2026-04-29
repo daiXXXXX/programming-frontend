@@ -68,6 +68,10 @@ const en: Record<string, string> = {
   'problems.viewProblem': 'View Problem',
   'problems.noProblems': 'No problems available',
   'problems.searchPlaceholder': 'Search problems...',
+  'problems.dailyTitle': 'Daily Challenge',
+  'problems.dailyMatchedTags': 'Similar to your recent Accepted tags:',
+  'problems.dailyMatchedDifficulty': 'Picked with a difficulty close to your recent Accepted problems',
+  'problems.dailyColdStart': 'A fresh unsolved problem to start today',
 
   // Problem Detail
   'problemDetail.backToList': 'Back to List',

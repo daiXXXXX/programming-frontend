@@ -83,6 +83,11 @@ class ApiClient {
     return this.request<Problem>(`/problems/${id}`, { requireAuth: false })
   }
 
+  // 登录用户的每日一题推荐，会在后端排除当前用户已经 Accepted 的题目。
+  async getDailyProblemRecommendation() {
+    return this.request<DailyProblemRecommendation>('/problems/daily-recommendation')
+  }
+
   // 题目管理API（需要教师权限）
   async createProblem(data: CreateProblemRequest) {
     return this.request<Problem>('/problems', {
@@ -321,6 +326,12 @@ export interface Problem {
   tags: string[]
   createdAt: string
   updatedAt?: string
+}
+
+export interface DailyProblemRecommendation {
+  problem: Problem | null
+  reason: 'matched_recent_tags' | 'matched_recent_difficulty' | 'cold_start' | 'no_available_problem' | string
+  matchedTags: string[]
 }
 
 export interface TestResult {
@@ -616,6 +627,8 @@ export interface WSMessage {
   type: WSMessageType
   channel?: string
   from?: SolutionAuthor
+  // WebSocket content is type-specific and is narrowed by each event handler.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   content: any
   timestamp: string
 }
