@@ -1,7 +1,7 @@
 'use client'
 
 import { Tabs, Button, Space, Spin, Typography, Dropdown, Avatar, Input } from 'antd'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { 
   Code, 
   ChartBar, 
@@ -17,7 +17,7 @@ import { SubmissionHistory } from '@/components/SubmissionHistory'
 import { DashboardStats } from '@/components/DashboardStats'
 import { motion } from 'framer-motion'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import { useI18n, useProblems, useSubmissions, useUIState, useAuth, getRoleLabel } from '@/hooks'
+import { useI18n, useProblems, useSubmissions, useUIState, useAuth, getRoleLabel, useUserStats } from '@/hooks'
 import { useMobileRedirect } from '@/hooks/use-mobile'
 import { Submission } from '@/lib/api'
 import styles from './page.module.css'
@@ -31,6 +31,7 @@ export default function WorkspacePage() {
   const { problems, loading: problemsLoading, searchProblems, refresh: refreshProblems } = useProblems()
   const [searchKeyword, setSearchKeyword] = useState('')
   const { submissions, loading: submissionsLoading, submitCode, getSolvedProblemIds, getProblemSubmissions } = useSubmissions()
+  const { userStats, loadUserStats } = useUserStats()
   const { user, isAuthenticated, logout } = useAuth()
   const { 
     activeTab, 
@@ -46,7 +47,18 @@ export default function WorkspacePage() {
   const selectedProblem = getSelectedProblem()
   const filteredProblems = getFilteredProblems()
   const solvedProblems = getSolvedProblemIds()
+  // 优先使用后端汇总统计，避免最近 100 条提交的本地缓存与排行榜口径不一致。
+  const solvedCount = userStats?.totalSolved ?? solvedProblems.size
   const loading = problemsLoading || submissionsLoading
+
+  // 提交记录变化后刷新一次统计，让页头“已解决”与排行榜保持同一后端口径。
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return
+    }
+
+    void loadUserStats()
+  }, [isAuthenticated, loadUserStats, submissions])
 
   const handleSubmitCode = async (problemId: string, code: string, language: string = 'JavaScript'): Promise<Submission | undefined> => {
     const submission = await submitCode({
@@ -194,7 +206,7 @@ export default function WorkspacePage() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Trophy size={20} className="text-amber-500" weight="fill" />
-                  <span className="font-semibold">{solvedProblems.size}</span>
+                  <span className="font-semibold">{solvedCount}</span>
                   <Text type="secondary">{t('header.solved')}</Text>
                 </div>
                 <Link href="/ranking">
